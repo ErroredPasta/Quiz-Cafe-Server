@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: QuizCafe
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: arrisung12@gmail.com
+    password: dpghknjwhaedskml
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/ssafy_spring_ws?serverTimezone=Asia/Seoul&useUniCode=yes&characterEncoding=UTF-8
+    username: ssafy
+    password: ssafy
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+server:
+  port: 8081
