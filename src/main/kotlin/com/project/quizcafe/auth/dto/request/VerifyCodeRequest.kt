@@ -1,4 +1,4 @@
-package com.project.quizcafe.user.dto.request
+package com.project.quizcafe.auth.dto.request
 
 data class VerifyCodeRequest(
     val toMail: String,

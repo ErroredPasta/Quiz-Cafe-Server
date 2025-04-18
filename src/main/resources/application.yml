@@ -1,4 +1,7 @@
 spring:
+  jwt:
+    secret: "9f7a2bdf3c1d1e58a1c0d2e9f0a3b26c73fe5d8c45eb8ab3b72429fdd4f5a392"
+    expiration: 3600000
   application:
     name: QuizCafe
   mail:
@@ -18,7 +21,7 @@ spring:
           writetimeout: 5000
 
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/ssafy_spring_ws?serverTimezone=Asia/Seoul&useUniCode=yes&characterEncoding=UTF-8
+    url: jdbc:mysql://127.0.0.1:3306/quiz_cafe_db?serverTimezone=Asia/Seoul&useUniCode=yes&characterEncoding=UTF-8
     username: ssafy
     password: ssafy
     driver-class-name: com.mysql.cj.jdbc.Driver
