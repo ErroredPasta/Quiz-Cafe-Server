@@ -49,9 +49,9 @@ class AuthController(
     fun verifyCode(@RequestBody request: VerifyCodeRequest): ResponseEntity<ApiResponse<Unit?>> {
         val isValid = authService.verifyCode(request.toMail, request.code)
         return if (isValid) {
-            ApiResponseFactory.success("비밀번호 재설정 성공")
+            ApiResponseFactory.success("인증 성공")
         } else {
-            ApiResponseFactory.error("비밀번호 재설정 실패")
+            ApiResponseFactory.error("인증 실패")
         }
     }
 
@@ -59,9 +59,9 @@ class AuthController(
     fun resetPassword(@RequestBody request: resetPasswordRequest): ResponseEntity<ApiResponse<Unit?>> {
         val isValid = authService.resetPassword(request.email)
         return if (isValid) {
-            ApiResponseFactory.success("인증 성공")
+            ApiResponseFactory.success("비밀번호 재설정 성공")
         } else {
-            ApiResponseFactory.error("인증 실패")
+            ApiResponseFactory.error("비밀번호 재설정 실패")
         }
     }
 
