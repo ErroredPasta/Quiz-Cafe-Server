@@ -1,11 +1,8 @@
 package com.project.quizcafe.user.controller
 
-import com.project.quizcafe.auth.dto.request.SendMailRequest
-import com.project.quizcafe.auth.dto.request.VerifyCodeRequest
 import com.project.quizcafe.user.service.UserService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -15,6 +12,7 @@ import com.project.quizcafe.common.response.ApiResponse
 import com.project.quizcafe.common.response.ApiResponseFactory
 import com.project.quizcafe.user.dto.request.ChangePasswordRequest
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.PatchMapping
 
 @RestController
 @RequestMapping("/user")
@@ -22,7 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 class UserController(
     private val userService: UserService
 ) {
-    @PostMapping("change-password")
+    @PatchMapping("password")
     @Operation(summary = "비밀번호 변경", description = "사용자가 자신의 비밀번호를 변경하는 API")
     fun changePassword(@RequestBody request: ChangePasswordRequest): ResponseEntity<ApiResponse<Unit?>> {
         val username = SecurityContextHolder.getContext().authentication.name

@@ -1,7 +1,7 @@
 package com.project.quizcafe.auth.service
 
-import com.project.quizcafe.auth.dto.request.LoginRequest
-import com.project.quizcafe.auth.dto.request.SignupRequest
+import com.project.quizcafe.auth.dto.request.SignInRequest
+import com.project.quizcafe.auth.dto.request.SignUpRequest
 import com.project.quizcafe.auth.dto.response.TokenResponse
 import com.project.quizcafe.auth.entity.EmailVerification
 import com.project.quizcafe.auth.repository.EmailVerificationRepository
@@ -29,7 +29,7 @@ class AuthServiceImpl(
     @Value("\${spring.mail.username}")
     private lateinit var senderEmail: String
 
-    override fun signup(request: SignupRequest){
+    override fun signUp(request: SignUpRequest){
         if (userRepository.existsByLoginEmail(request.loginEmail)) {
             throw IllegalArgumentException("이미 존재하는 이메일입니다.")
         }
@@ -46,7 +46,7 @@ class AuthServiceImpl(
         userRepository.save(user)
     }
 
-    override fun login(request: LoginRequest): TokenResponse {
+    override fun signIn(request: SignInRequest): TokenResponse {
         val user = userRepository.findByLoginEmail(request.loginEmail)
             ?: throw IllegalArgumentException("존재하지 않는 이메일입니다.")
         if (!passwordEncoder.matches(request.password, user.password)) {
@@ -57,7 +57,7 @@ class AuthServiceImpl(
         return TokenResponse(token)
     }
 
-    override fun sendMail(toMail:String){
+    override fun sendCode(toMail:String){
         val user = userRepository.findByLoginEmail(toMail)
             ?: throw IllegalArgumentException("존재하지 않는 이메일입니다.")
         val mimeMessage = mailSender.createMimeMessage()

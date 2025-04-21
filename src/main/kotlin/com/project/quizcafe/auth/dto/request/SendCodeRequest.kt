@@ -1,5 +1,5 @@
 package com.project.quizcafe.auth.dto.request
 
-data class SendMailRequest(
+data class SendCodeRequest(
     val toMail: String
 )

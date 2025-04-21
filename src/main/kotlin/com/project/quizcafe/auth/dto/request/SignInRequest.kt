@@ -1,8 +1,6 @@
 package com.project.quizcafe.auth.dto.request
 
-data class SignupRequest(
-    val id: Long?,
+data class SignInRequest(
     val loginEmail: String,
     val password: String,
-    val nickName: String
 )
