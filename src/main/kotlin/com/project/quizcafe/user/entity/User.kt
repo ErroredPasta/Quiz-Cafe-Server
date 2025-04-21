@@ -2,6 +2,9 @@ package com.project.quizcafe.user.entity
 
 import com.project.quizcafe.common.model.Role
 import jakarta.persistence.*
+import org.hibernate.annotations.CreationTimestamp
+import org.springframework.data.annotation.CreatedDate
+import java.time.LocalDateTime
 
 @Entity
 @Table(
@@ -18,5 +21,8 @@ data class User(
     @Column(name = "nick_name", nullable = false)
     val nickName: String,
     @Enumerated(EnumType.STRING)
-    val role: Role = Role.USER
+    val role: Role = Role.USER,
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    val createdAt: LocalDateTime? = null
 )
