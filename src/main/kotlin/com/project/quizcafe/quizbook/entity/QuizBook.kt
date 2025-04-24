@@ -11,13 +11,13 @@ class QuizBook(
     var id: Long = 0,
 
     @Column(nullable = false)
-    val category: String,
+    var category: String,
 
     @Column(nullable = false)
-    val title: String,
+    var title: String,
 
     @Column(columnDefinition = "TEXT")
-    val description: String,
+    var description: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = true)

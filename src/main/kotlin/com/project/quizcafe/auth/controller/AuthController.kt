@@ -40,7 +40,7 @@ class AuthController(
         return ApiResponseFactory.successWithData(token, "로그인 성공")
     }
 
-    @PostMapping("/verification-code")
+    @PostMapping("/verification-code/send")
     @Operation(summary = "메일 인증 코드 전송", description = "사용자 이메일로 인증 코드를 전송하는 API")
     fun sendCode(@RequestBody request: SendCodeRequest): ResponseEntity<ApiResponse<Unit?>> {
         try {
@@ -52,7 +52,7 @@ class AuthController(
         }
     }
 
-    @PatchMapping("/verification-code")
+    @PostMapping("/verification-code/verify")
     @Operation(summary = "메일 인증 코드 검증", description = "사용자가 입력한 메일 인증 코드의 유효성을 검증하는 API")
     fun verifyCode(@RequestBody request: VerifyCodeRequest): ResponseEntity<ApiResponse<Unit?>> {
         val isValid = authService.verifyCode(request.toMail, request.code)
