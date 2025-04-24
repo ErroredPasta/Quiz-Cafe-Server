@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -42,9 +43,9 @@ class AuthController(
 
     @PostMapping("/verification-code/send")
     @Operation(summary = "메일 인증 코드 전송", description = "사용자 이메일로 인증 코드를 전송하는 API")
-    fun sendCode(@RequestBody request: SendCodeRequest): ResponseEntity<ApiResponse<Unit?>> {
+    fun sendCode(@RequestParam email: String): ResponseEntity<ApiResponse<Unit?>> {
         try {
-            authService.sendCode(request.toMail)
+            authService.sendCode(email)
             return ApiResponseFactory.success()
         } catch (e: Exception) {
             print(e.toString())
@@ -65,8 +66,8 @@ class AuthController(
 
     @PostMapping("/password/reset")
     @Operation(summary = "비밀번호 재설정", description = "사용자의 비밀번호를 재설정하는 API")
-    fun resetPassword(@RequestBody request: ResetPasswordRequest): ResponseEntity<ApiResponse<Unit?>> {
-        val isValid = authService.resetPassword(request.email)
+    fun resetPassword(@RequestParam email: String): ResponseEntity<ApiResponse<Unit?>> {
+        val isValid = authService.resetPassword(email)
         return if (isValid) {
             ApiResponseFactory.success("비밀번호 재설정 성공")
         } else {
