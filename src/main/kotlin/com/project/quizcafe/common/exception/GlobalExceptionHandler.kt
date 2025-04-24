@@ -16,6 +16,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleGeneralException(e: Exception): ResponseEntity<ApiResponse<Unit?>> {
+        print(e)
         return ApiResponseFactory.error(message = "서버 오류가 발생했습니다.")
     }
 }
