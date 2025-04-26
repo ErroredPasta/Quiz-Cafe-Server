@@ -30,9 +30,9 @@ class QuizBookController(
 
     @PostMapping
     @Operation(summary = "퀴즈북 만들기", description = "사용자가 퀴즈북 생성")
-    fun createQuizBook(@RequestBody request: CreateQuizBookRequest): ResponseEntity<ApiResponse<Unit?>> {
-        val createQuizBookRequest = quizBookService.createQuizBook(request)
-        return ApiResponseFactory.success("문제집 생성 성공")
+    fun createQuizBook(@RequestBody request: CreateQuizBookRequest): ResponseEntity<ApiResponse<Long>> {
+        val createdQuizBook = quizBookService.createQuizBook(request)
+        return ApiResponseFactory.successWithData(createdQuizBook.id, "문제집 생성 성공")
     }
 
     @GetMapping
