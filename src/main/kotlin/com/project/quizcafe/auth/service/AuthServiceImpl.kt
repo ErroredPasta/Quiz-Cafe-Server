@@ -1,9 +1,11 @@
 package com.project.quizcafe.auth.service
 
+import com.project.quizcafe.auth.dto.request.SendCodeRequest
 import com.project.quizcafe.auth.dto.request.SignInRequest
 import com.project.quizcafe.auth.dto.request.SignUpRequest
 import com.project.quizcafe.auth.dto.response.TokenResponse
 import com.project.quizcafe.auth.entity.EmailVerification
+import com.project.quizcafe.auth.entity.VerificationType
 import com.project.quizcafe.auth.repository.EmailVerificationRepository
 import com.project.quizcafe.auth.security.JwtTokenProvider
 import com.project.quizcafe.common.model.Role
@@ -57,9 +59,21 @@ class AuthServiceImpl(
         return TokenResponse(token)
     }
 
-    override fun sendCode(toMail:String){
-        val user = userRepository.findByLoginEmail(toMail)
-            ?: throw IllegalArgumentException("존재하지 않는 이메일입니다.")
+    override fun sendCode(toMail: String, type: VerificationType){
+
+        when (type) {
+            VerificationType.SIGN_UP -> {
+                if (userRepository.existsByLoginEmail(toMail)) {
+                    throw IllegalArgumentException("이미 존재하는 이메일입니다.")
+                }
+            }
+            VerificationType.RESET_PASSWORD -> {
+                if (!userRepository.existsByLoginEmail(toMail)) {
+                    throw IllegalArgumentException("존재하지 않는 이메일입니다.")
+                }
+            }
+        }
+
         val mimeMessage = mailSender.createMimeMessage()
         val mimeMessageHelper = MimeMessageHelper(mimeMessage, false, null)
         val senderName = "QuizCafe"

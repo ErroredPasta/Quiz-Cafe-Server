@@ -42,10 +42,20 @@ class AuthController(
     }
 
     @PostMapping("/verification-code/send")
-    @Operation(summary = "메일 인증 코드 전송", description = "사용자 이메일로 인증 코드를 전송하는 API")
-    fun sendCode(@RequestParam email: String): ResponseEntity<ApiResponse<Unit?>> {
+    @Operation(
+        summary = "메일 인증 코드 전송",
+        description = """
+        사용자가 입력한 메일 인증 코드의 유효성을 검증하는 API
+        인증 코드 유형:
+        - SIGN_UP: 회원가입
+        - RESET_PASSWORD: 비밀번호 재설정
+    """
+    )
+    fun sendCode(
+        @RequestBody request: SendCodeRequest
+    ): ResponseEntity<ApiResponse<Unit?>> {
         try {
-            authService.sendCode(email)
+            authService.sendCode(request.toMail, request.type)
             return ApiResponseFactory.success()
         } catch (e: Exception) {
             print(e.toString())
