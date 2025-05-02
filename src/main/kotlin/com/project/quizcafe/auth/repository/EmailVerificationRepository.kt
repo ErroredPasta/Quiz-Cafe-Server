@@ -12,7 +12,6 @@ import java.util.Optional
 @Repository
 interface EmailVerificationRepository : JpaRepository<EmailVerification, Long> {
     fun findByEmail(email: String): Optional<EmailVerification>
-
     @Transactional
     fun deleteByEmail(email: String): Int  // 이메일로 삭제
 

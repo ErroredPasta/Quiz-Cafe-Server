@@ -30,19 +30,19 @@ class UserController(
     @Operation(summary = "비밀번호 변경", description = "사용자가 자신의 비밀번호를 변경하는 API")
     fun changePassword(@RequestBody request: ChangePasswordRequest): ResponseEntity<ApiResponse<Unit?>> {
         val username = SecurityContextHolder.getContext().authentication.name
-        val isPasswordChanged = userService.changePassword(username, request.oldPassword, request.newPassword)
-
-        return if (isPasswordChanged) {
-            ApiResponseFactory.success("비밀번호 변경 성공")
-        } else {
-            ApiResponseFactory.error("비밀번호 변경 실패")
-        }
+        userService.changePassword(username, request.oldPassword, request.newPassword)
+        return ApiResponseFactory.success(
+            message = "비밀번호 변경 성공"
+        )
     }
 
     @GetMapping("quiz-book")
     @Operation(summary = "내 퀴즈북 조회", description = "사용자가 만든 퀴즈북 조회")
-    fun getMyQuizBook(@AuthenticationPrincipal principal: UserDetailsImpl): ResponseEntity<ApiResponse<List<GetQuizBookResponse>>> {
+    fun getMyQuizBook(@AuthenticationPrincipal principal: UserDetailsImpl): ResponseEntity<ApiResponse<List<GetQuizBookResponse>?>> {
         val result = quizBookService.getMyQuizBooks(principal.getUser())
-        return ApiResponseFactory.successWithData(result,"문제집 조회 성공")
+        return ApiResponseFactory.success(
+            data = result,
+            message = "문제집 조회 성공"
+        )
     }
 }

@@ -8,6 +8,7 @@ import com.project.quizcafe.auth.entity.EmailVerification
 import com.project.quizcafe.auth.entity.VerificationType
 import com.project.quizcafe.auth.repository.EmailVerificationRepository
 import com.project.quizcafe.auth.security.JwtTokenProvider
+import com.project.quizcafe.common.exception.*
 import com.project.quizcafe.common.model.Role
 import com.project.quizcafe.user.entity.User
 import com.project.quizcafe.user.repository.UserRepository
@@ -31,10 +32,23 @@ class AuthServiceImpl(
     @Value("\${spring.mail.username}")
     private lateinit var senderEmail: String
 
-    override fun signUp(request: SignUpRequest){
-        if (userRepository.existsByLoginEmail(request.loginEmail)) {
-            throw IllegalArgumentException("이미 존재하는 이메일입니다.")
+    override fun signUp(request: SignUpRequest) {
+        if (!request.loginEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) {
+            throw BadRequestException("잘못된 이메일 형식입니다.")
         }
+
+        if (userRepository.existsByLoginEmail(request.loginEmail)) {
+            throw ConflictException("이미 존재하는 이메일입니다.")
+        }
+
+        if (request.password.length < 8) {
+            throw BadRequestException("비밀번호는 최소 8자 이상이어야 합니다.")
+        }
+
+        if (userRepository.existsByNickName(request.nickName)) {
+            throw ConflictException("이미 사용 중인 닉네임입니다.")
+        }
+
         val encodedPassword = passwordEncoder.encode(request.password)
 
         val user = User(
@@ -45,8 +59,14 @@ class AuthServiceImpl(
             role = Role.USER
         )
 
-        userRepository.save(user)
+        try {
+            userRepository.save(user)
+        } catch (e: Exception) {
+            throw InternalServerErrorException("회원가입 처리 중 오류가 발생했습니다.")
+        }
     }
+
+
 
     override fun signIn(request: SignInRequest): TokenResponse {
         val user = userRepository.findByLoginEmail(request.loginEmail)

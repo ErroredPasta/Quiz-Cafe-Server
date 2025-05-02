@@ -9,6 +9,7 @@ import com.project.quizcafe.quizbook.dto.response.GetQuizBookResponse
 import com.project.quizcafe.quizbook.service.QuizBookService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -30,20 +31,27 @@ class QuizBookController(
 
     @PostMapping
     @Operation(summary = "퀴즈북 만들기", description = "사용자가 퀴즈북 생성")
-    fun createQuizBook(@RequestBody request: CreateQuizBookRequest): ResponseEntity<ApiResponse<Long>> {
+    fun createQuizBook(@RequestBody request: CreateQuizBookRequest): ResponseEntity<ApiResponse<Long?>> {
         val createdQuizBook = quizBookService.createQuizBook(request)
-        return ApiResponseFactory.successWithData(createdQuizBook.id, "문제집 생성 성공")
+        return ApiResponseFactory.success(
+            data = createdQuizBook.id,
+            message = "문제집 생성 성공",
+            status = HttpStatus.CREATED
+        )
     }
 
     @GetMapping
     @Operation(summary = "카테고리로 퀴즈북 조회", description = "카테고리에 해당하는 퀴즈북 조회")
     fun getQuizBooksByCategoryOfMine(
         @RequestParam category: String
-    ): ResponseEntity<ApiResponse<List<GetQuizBookResponse>>> {
+    ): ResponseEntity<ApiResponse<List<GetQuizBookResponse>?>> {
 
         val result = quizBookService.getQuizBooksByCategory(category)
 
-        return ApiResponseFactory.successWithData(result, "문제집 조회 성공")
+        return ApiResponseFactory.success(
+            data = result,
+            message = "문제집 조회 성공"
+        )
     }
 
     @PatchMapping("/{quizBookId}")
@@ -54,7 +62,9 @@ class QuizBookController(
         @AuthenticationPrincipal principal: UserDetailsImpl
     ): ResponseEntity<ApiResponse<Unit?>> {
         quizBookService.updateQuizBook(quizBookId, request, principal.getUser())
-        return ApiResponseFactory.success("문제집 수정 완료")
+        return ApiResponseFactory.success(
+            message = "문제집 수정 완료"
+        )
     }
 
     @DeleteMapping("/{quizBookId}")
@@ -64,7 +74,9 @@ class QuizBookController(
         @AuthenticationPrincipal principal: UserDetailsImpl
     ): ResponseEntity<ApiResponse<Unit?>> {
         quizBookService.deleteQuizBook(quizBookId, principal.getUser())
-        return ApiResponseFactory.success("문제집 삭제 성공")
+        return ApiResponseFactory.success(
+            message = "문제집 삭제 성공"
+        )
     }
 
 }

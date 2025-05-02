@@ -4,37 +4,35 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
 object ApiResponseFactory {
-    fun success(message: String = "요청 성공", code: Int = HttpStatus.OK.value()): ResponseEntity<ApiResponse<Unit?>> {
-        return ResponseEntity.ok(
-            ApiResponse(
-                status = "success",
-                code = code,
-                message = message,
-                data = null
-            )
-        )
-    }
 
-    fun <T> successWithData(data: T, message: String = "요청 성공", code: Int = HttpStatus.OK.value()): ResponseEntity<ApiResponse<T>> {
-        return ResponseEntity.ok(
-            ApiResponse(
-                status = "success",
-                code = code,
-                message = message,
-                data = data
-            )
-        )
-    }
-
-    fun error(message: String = "요청 실패", code: Int = HttpStatus.BAD_REQUEST.value()): ResponseEntity<ApiResponse<Unit?>> {
+    fun <T> success(
+        data: T? = null,
+        message: String = "요청 성공",
+        status: HttpStatus = HttpStatus.OK
+    ): ResponseEntity<ApiResponse<T?>> {
         return ResponseEntity
-            .status(code)
+            .status(status)
             .body(
                 ApiResponse(
-                    status = "error",
-                    code = code,
+                    status = "success",
+                    code = status.value(),
                     message = message,
-                    data = null
+                    data = data
+                )
+            )
+    }
+
+    fun error(
+        message: String = "요청 실패",
+        status: HttpStatus = HttpStatus.BAD_REQUEST
+    ): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(status)
+            .body(
+                ErrorResponse(
+                    status = "error",
+                    code = status.value(),
+                    message = message
                 )
             )
     }

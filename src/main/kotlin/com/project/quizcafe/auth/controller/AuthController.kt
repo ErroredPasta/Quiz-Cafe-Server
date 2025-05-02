@@ -31,14 +31,20 @@ class AuthController(
     @Operation(summary = "회원가입", description = "사용자의 회원가입을 처리하는 API")
     fun signup(@RequestBody request: SignUpRequest): ResponseEntity<ApiResponse<Unit?>> {
         authService.signUp(request)
-        return ApiResponseFactory.success("회원가입 성공")
+        return ApiResponseFactory.success(
+            message = "회원가입 성공",
+            status = HttpStatus.CREATED // 201 Created
+        )
     }
 
     @PostMapping("/sign-in")
     @Operation(summary = "로그인", description = "사용자의 로그인 및 JWT 토큰 발급 API")
-    fun signIn(@RequestBody request: SignInRequest): ResponseEntity<ApiResponse<TokenResponse>> {
+    fun signIn(@RequestBody request: SignInRequest): ResponseEntity<ApiResponse<TokenResponse?>> {
         val token = authService.signIn(request)
-        return ApiResponseFactory.successWithData(token, "로그인 성공")
+        return ApiResponseFactory.success(
+            data = token,
+            message = "로그인 성공"
+        )
     }
 
     @PostMapping("/verification-code/send")
@@ -54,35 +60,30 @@ class AuthController(
     fun sendCode(
         @RequestBody request: SendCodeRequest
     ): ResponseEntity<ApiResponse<Unit?>> {
-        try {
-            authService.sendCode(request.toMail, request.type)
-            return ApiResponseFactory.success()
-        } catch (e: Exception) {
-            print(e.toString())
-            return ApiResponseFactory.error("요청 실패", HttpStatus.INTERNAL_SERVER_ERROR.value())
-        }
+
+        authService.sendCode(request.toMail, request.type)
+        return ApiResponseFactory.success(
+            message = "메일 인증 코드 전송됨",
+            status = HttpStatus.ACCEPTED
+        )
     }
 
     @PostMapping("/verification-code/verify")
     @Operation(summary = "메일 인증 코드 검증", description = "사용자가 입력한 메일 인증 코드의 유효성을 검증하는 API")
     fun verifyCode(@RequestBody request: VerifyCodeRequest): ResponseEntity<ApiResponse<Unit?>> {
-        val isValid = authService.verifyCode(request.toMail, request.code)
-        return if (isValid) {
-            ApiResponseFactory.success("인증 성공")
-        } else {
-            ApiResponseFactory.error("인증 실패")
-        }
+        authService.verifyCode(request.toMail, request.code)
+        return ApiResponseFactory.success(
+            message = "인증 성공"
+        )
     }
 
     @PostMapping("/password/reset")
     @Operation(summary = "비밀번호 재설정", description = "사용자의 비밀번호를 재설정하는 API")
     fun resetPassword(@RequestParam email: String): ResponseEntity<ApiResponse<Unit?>> {
-        val isValid = authService.resetPassword(email)
-        return if (isValid) {
-            ApiResponseFactory.success("비밀번호 재설정 성공")
-        } else {
-            ApiResponseFactory.error("비밀번호 재설정 실패")
-        }
+        authService.resetPassword(email)
+        return ApiResponseFactory.success(
+            message = "비밀번호 재설정 성공"
+        )
     }
 
 }
