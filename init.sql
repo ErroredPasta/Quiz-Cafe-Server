@@ -58,44 +58,6 @@ CREATE TABLE mcq_option (
     CONSTRAINT fk_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id)
 );
 
-INSERT INTO user (login_email, password, nick_name)
-VALUES ('test@example.com', 'test1234', '테스트유저');
-
--- 예시 데이터 삽입
--- 문제집 삽입
-INSERT INTO quiz_book (category, title, description, created_by)
-VALUES ('Math', 'Math Quiz 1', 'This is a math quiz for beginners', 1);
-
-INSERT INTO quiz_book (category, title, description, created_by)
-VALUES ('코틀린', '코틀린1', '코틀린1', 2)
-
--- 자바 관련 데이터 추가
-INSERT INTO quiz_book (category, title, description, created_by)
-VALUES ('자바', '자바2', '자바 관련 퀴즈', 2);
-
-INSERT INTO quiz_book (category, title, description, created_by)
-VALUES ('자바', '자바3', '자바 관련 퀴즈', 2);
-
--- 코틀린 관련 데이터 추가
-INSERT INTO quiz_book (category, title, description, created_by)
-VALUES ('코틀린', '코틀린2', '코틀린 관련 퀴즈', 2);
-
-INSERT INTO quiz_book (category, title, description, created_by)
-VALUES ('코틀린', '코틀린3', '코틀린 관련 퀴즈', 2);
-
--- 퀴즈 삽입
-INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
-VALUES
-(1, 'MCQ', 'What is 2 + 2?', '4', '2 + 2는 4입니다.');
-
--- 객관식 선택지 삽입
-INSERT INTO mcq_option (quiz_id, option_number, option_content, is_correct)
-VALUES
-    (1, 1, '1', FALSE),
-    (1, 2, '2', FALSE),
-    (1, 3, '3', FALSE),
-    (1, 4, '4', TRUE);
-
 -- 데이터 확인
 SELECT * FROM quiz_book;
 SELECT * FROM quiz;
