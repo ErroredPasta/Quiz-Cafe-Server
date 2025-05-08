@@ -62,7 +62,17 @@ jobs:
           fi
 
       - name: docker run new container
-        run: sudo docker run --rm -it -d -p 80:8080 --name spring-cicd-test ${{ secrets.DOCKERHUB_USERNAME }}/spring-cicd-test
+        run: |
+          sudo docker run --rm -it -d -p 80:8080 \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -e JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
+            -e MAIL_USERNAME=${{ secrets.MAIL_USERNAME }} \
+            -e MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} \
+            -e DB_URL=${{ secrets.DB_URL }} \
+            -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
+            --name spring-cicd-test ${{ secrets.DOCKERHUB_USERNAME }}/spring-cicd-test
 
       - name: delete old docker image
         run: sudo docker system prune -f
