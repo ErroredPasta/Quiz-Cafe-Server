@@ -31,7 +31,7 @@ jobs:
         run: ./gradlew build -x test
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/spring-cicd-test .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server .
 
       - name: Docker login
         uses: docker/login-action@v2
@@ -40,7 +40,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Docker push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/spring-cicd-test
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
 
   run-docker-image-on-ec2:
     needs: build
@@ -48,12 +48,12 @@ jobs:
 
     steps:
       - name: Docker pull image
-        run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/spring-cicd-test
+        run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
 
       - name: Stop old container if exists
         run: |
-          if [ $(sudo docker ps -a -q -f name=spring-cicd-test) ]; then
-            sudo docker stop spring-cicd-test
+          if [ $(sudo docker ps -a -q -f name=quiz-cafe-server) ]; then
+            sudo docker stop quiz-cafe-server
           fi
 
       - name: Run new container with env
@@ -67,7 +67,7 @@ jobs:
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
             -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
             -e SERVER_PORT="${{ secrets.SERVER_PORT }}" \
-            --name spring-cicd-test ${{ secrets.DOCKERHUB_USERNAME }}/spring-cicd-test
+            --name quiz-cafe-server ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
 
       - name: Remove unused Docker images
         run: sudo docker system prune -f
