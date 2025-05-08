@@ -1,41 +1,91 @@
-run-docker-image-on-ec2:
-  needs: build
-  runs-on: self-hosted
+name: Java CI with Gradle
 
-  steps:
-    - name: Docker pull image
-      run: |
-        echo "Pulling Docker image from Docker Hub..."
-        sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-    - name: Stop old container if exists
-      run: |
-        echo "Checking for old containers..."
-        if [ $(sudo docker ps -a -q -f name=quiz-cafe-server) ]; then
-          echo "Stopping old container..."
-          sudo docker stop quiz-cafe-server
-          echo "Removing old container..."
-          sudo docker rm quiz-cafe-server
-        else
-          echo "No old container found"
-        fi
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
-    - name: Run new container with env
-      run: |
-        echo "Running new container..."
-        sudo docker run --rm -it -d -p 80:8080 \
-          -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
-          -e JWT_EXPIRATION="${{ secrets.JWT_EXPIRATION }}" \
-          -e MAIL_USERNAME="${{ secrets.MAIL_USERNAME }}" \
-          -e MAIL_PASSWORD="${{ secrets.MAIL_PASSWORD }}" \
-          -e DB_URL="${{ secrets.DB_URL }}" \
-          -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
-          -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-          -e SERVER_PORT="${{ secrets.SERVER_PORT }}" \
-          --name quiz-cafe-server ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
-        echo "Docker container running"
+    steps:
+      - uses: actions/checkout@v4
 
-    - name: Remove unused Docker images
-      run: |
-        echo "Cleaning up unused Docker images..."
-        sudo docker system prune -f
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle Wrapper (without test)
+        run: |
+          echo "Building with Gradle..."
+          ./gradlew build -x test
+
+      - name: Build Docker image
+        run: |
+          echo "Building Docker image..."
+          docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server .
+
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Docker push
+        run: |
+          echo "Pushing Docker image to Docker Hub..."
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
+
+  run-docker-image-on-ec2:
+    needs: build
+    runs-on: self-hosted
+
+    steps:
+      - name: Docker pull image
+        run: |
+          echo "Pulling Docker image from Docker Hub..."
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
+
+      - name: Stop old container if exists
+        run: |
+          echo "Checking for old containers..."
+          if [ $(sudo docker ps -a -q -f name=quiz-cafe-server) ]; then
+            echo "Stopping old container..."
+            sudo docker stop quiz-cafe-server
+            echo "Removing old container..."
+            sudo docker rm quiz-cafe-server
+          else
+            echo "No old container found"
+          fi
+
+      - name: Run new container with env
+        run: |
+          echo "Running new container..."
+          sudo docker run --rm -it -d -p 80:8080 \
+            -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            -e JWT_EXPIRATION="${{ secrets.JWT_EXPIRATION }}" \
+            -e MAIL_USERNAME="${{ secrets.MAIL_USERNAME }}" \
+            -e MAIL_PASSWORD="${{ secrets.MAIL_PASSWORD }}" \
+            -e DB_URL="${{ secrets.DB_URL }}" \
+            -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+            -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            -e SERVER_PORT="${{ secrets.SERVER_PORT }}" \
+            --name quiz-cafe-server ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
+          echo "Docker container running"
+
+      - name: Remove unused Docker images
+        run: |
+          echo "Cleaning up unused Docker images..."
+          sudo docker system prune -f
