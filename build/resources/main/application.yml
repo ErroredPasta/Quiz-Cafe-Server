@@ -1,14 +1,13 @@
 spring:
   jwt:
-    secret: "9f7a2bdf3c1d1e58a1c0d2e9f0a3b26c73fe5d8c45eb8ab3b72429fdd4f5a392"
-    expiration: 3600000
-  application:
-    name: QuizCafe
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION:3600000}
+
   mail:
     host: smtp.gmail.com
     port: 587
-    username: arrisung12@gmail.com
-    password: dpghknjwhaedskml
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -16,15 +15,12 @@ spring:
           starttls:
             enable: true
             required: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
 
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/quiz_cafe_db?serverTimezone=Asia/Seoul&useUniCode=yes&characterEncoding=UTF-8
-    username: ssafy
-    password: ssafy
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 server:
-  port: 8081
+  port: ${SERVER_PORT:8081}
