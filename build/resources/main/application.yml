@@ -1,13 +1,13 @@
 spring:
   jwt:
-    secret: ${JWT_SECRET}
-    expiration: ${JWT_EXPIRATION:3600000}
+    secret: 9f7a2bdf3c1d1e58a1c0d2e9f0a3b26c73fe5d8c45eb8ab3b72429fdd4f5a392
+    expiration: 3600000
 
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    username: arrisung12@gmail.com
+    password: gsogddqkklmbgaib
     properties:
       mail:
         smtp:
@@ -17,10 +17,18 @@ spring:
             required: true
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://quizcafedb.cxew040oi1gh.us-east-2.rds.amazonaws.com:3306/Quiz_Cafe_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: kimseongmin
+    password: SmkS2626**
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
 server:
-  port: ${SERVER_PORT:8080}
+  port: 8080

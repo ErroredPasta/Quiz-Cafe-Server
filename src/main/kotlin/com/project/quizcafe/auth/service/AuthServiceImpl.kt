@@ -119,7 +119,11 @@ class AuthServiceImpl(
             .orElseThrow { IllegalArgumentException("등록된 인증 코드가 없습니다.") }
 
         // 인증 코드가 일치하고, 유효 기간이 지나지 않았는지 확인
-        return emailVerification.verificationCode == code && emailVerification.expiresAt.isAfter(LocalDateTime.now())
+        if(emailVerification.verificationCode == code
+            && emailVerification.expiresAt.isAfter(LocalDateTime.now())
+        ){
+            return true
+        }else throw Exception()
     }
 
     override fun resetPassword(email: String) : Boolean{
