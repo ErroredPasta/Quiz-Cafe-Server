@@ -1,5 +1,7 @@
 package com.project.quizcafe.user.service
 
+import com.project.quizcafe.user.dto.request.UpdateUserInfoRequest
+import com.project.quizcafe.user.dto.response.UserInfoResponse
 import com.project.quizcafe.user.entity.User
 import com.project.quizcafe.user.repository.UserRepository
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -27,5 +29,23 @@ class UserServiceImpl(private val userRepository: UserRepository) : UserService 
         userRepository.save(updatedUser)
 
         return true
+    }
+
+    override fun deleteUser(user: User) {
+        userRepository.delete(user)
+    }
+
+    override fun updateUserInfo(user: User, request: UpdateUserInfoRequest) {
+        val updatedUser = user.copy(
+            nickName = request.nickname
+        )
+        userRepository.save(updatedUser)
+    }
+
+    override fun getUserInfo(user: User): UserInfoResponse {
+        return UserInfoResponse(
+            nickname = user.nickName,
+            email = user.loginEmail
+        )
     }
 }
