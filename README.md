@@ -4,6 +4,8 @@
 ### swagger
 http://localhost:8081/swagger-ui/index.html#/
 
+http://3.149.254.237:8081/swagger-ui/index.html#/
+
 ### api.json 확인
 http://localhost:8081/v3/api-docs
 

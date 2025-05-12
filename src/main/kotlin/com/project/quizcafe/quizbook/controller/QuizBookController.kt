@@ -6,6 +6,7 @@ import com.project.quizcafe.common.response.ApiResponseFactory
 import com.project.quizcafe.quizbook.dto.request.CreateQuizBookRequest
 import com.project.quizcafe.quizbook.dto.request.UpdateQuizBookRequest
 import com.project.quizcafe.quizbook.dto.response.GetQuizBookResponse
+import com.project.quizcafe.quizbook.entity.QuizCategory
 import com.project.quizcafe.quizbook.service.QuizBookService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -76,6 +77,19 @@ class QuizBookController(
         quizBookService.deleteQuizBook(quizBookId, principal.getUser())
         return ApiResponseFactory.success(
             message = "문제집 삭제 성공"
+        )
+    }
+
+    @GetMapping("/category")
+    @Operation(summary = "모든 카테고리 조회", description = "모든 카테고리 조회")
+    fun getAllCategories(): ResponseEntity<ApiResponse<List<QuizCategory>?>> {
+        // Category enum을 리스트로 반환
+        val categories = QuizCategory.entries
+
+        return ApiResponseFactory.success(
+            data = categories,
+            message = "카테고리 조회 성공",
+            status = HttpStatus.OK
         )
     }
 

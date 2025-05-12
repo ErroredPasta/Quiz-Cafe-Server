@@ -7,7 +7,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: arrisung12@gmail.com
-    password: gsogddqkklmbgaib
+    password: dpghknjwhaedskml
     properties:
       mail:
         smtp:
@@ -21,14 +21,6 @@ spring:
     username: kimseongmin
     password: SmkS2626**
     driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
 
 server:
   port: 8080
