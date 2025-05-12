@@ -58,6 +58,16 @@ CREATE TABLE mcq_option (
     CONSTRAINT fk_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id)
 );
 
+CREATE TABLE quiz_book_bookmark (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    quiz_book_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user(id),
+    CONSTRAINT fk_quiz_book FOREIGN KEY (quiz_book_id) REFERENCES quiz_book(id),
+    CONSTRAINT unique_user_quiz_book UNIQUE (user_id, quiz_book_id) -- 같은 사용자가 같은 퀴즈북을 두 번 북마크할 수 없게
+);
+
 -- 데이터 확인
 SELECT * FROM quiz_book;
 SELECT * FROM quiz;
