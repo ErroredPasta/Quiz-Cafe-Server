@@ -68,6 +68,45 @@ CREATE TABLE quiz_book_bookmark (
     CONSTRAINT unique_user_quiz_book UNIQUE (user_id, quiz_book_id) -- 같은 사용자가 같은 퀴즈북을 두 번 북마크할 수 없게
 );
 
+CREATE TABLE quiz_book_solving (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    quiz_book_id BIGINT NOT NULL,
+    category VARCHAR(255) NOT NULL, -- 카테고리
+    title VARCHAR(255) NOT NULL,    -- 제목
+    description TEXT,               -- 설명
+    total_quizzes INT NOT NULL,     -- 전체 문제 수
+    correct_count INT NOT NULL,     -- 맞춘 문제 수
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, -- 완료 시간
+    CONSTRAINT fk_solving_user FOREIGN KEY (user_id) REFERENCES user(id),
+    CONSTRAINT fk_solving_quiz_book FOREIGN KEY (quiz_book_id) REFERENCES quiz_book(id)
+);
+
+CREATE TABLE quiz_solving (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    quiz_book_solving_id BIGINT NOT NULL,
+    quiz_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    question_type ENUM('MCQ', 'SHORT_ANSWER', 'OX') NOT NULL,
+    content TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    explanation TEXT,
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT fk_qs_quiz_book_solving FOREIGN KEY (quiz_book_solving_id) REFERENCES quiz_book_solving(id),
+    CONSTRAINT fk_qs_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id),
+    CONSTRAINT fk_qs_user FOREIGN KEY (user_id) REFERENCES user(id)
+);
+
+CREATE TABLE mcq_option_solving (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    quiz_solving_id BIGINT NOT NULL,
+    option_number INT NOT NULL,
+    option_content TEXT NOT NULL,
+    is_correct BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT fk_mos_quiz_solving FOREIGN KEY (quiz_solving_id) REFERENCES quiz_solving(id)
+);
+
+
 -- 데이터 확인
 SELECT * FROM quiz_book;
 SELECT * FROM quiz;
