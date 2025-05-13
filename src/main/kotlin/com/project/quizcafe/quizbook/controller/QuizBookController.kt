@@ -5,6 +5,7 @@ import com.project.quizcafe.common.response.ApiResponse
 import com.project.quizcafe.common.response.ApiResponseFactory
 import com.project.quizcafe.quizbook.dto.request.CreateQuizBookRequest
 import com.project.quizcafe.quizbook.dto.request.UpdateQuizBookRequest
+import com.project.quizcafe.quizbook.dto.response.GetAllCategoriesResponse
 import com.project.quizcafe.quizbook.dto.response.GetQuizBookResponse
 import com.project.quizcafe.quizbook.entity.QuizCategory
 import com.project.quizcafe.quizbook.service.QuizBookService
@@ -82,9 +83,15 @@ class QuizBookController(
 
     @GetMapping("/category")
     @Operation(summary = "모든 카테고리 조회", description = "모든 카테고리 조회")
-    fun getAllCategories(): ResponseEntity<ApiResponse<List<QuizCategory>?>> {
-        // Category enum을 리스트로 반환
-        val categories = QuizCategory.entries
+    fun getAllCategories(): ResponseEntity<ApiResponse<List<GetAllCategoriesResponse>?>> {
+        // Category enum을 DTO로 변환
+        val categories = QuizCategory.entries.map { category ->
+            GetAllCategoriesResponse(
+                category = category.name,
+                name = category.categoryName,
+                group = category.group
+            )
+        }
 
         return ApiResponseFactory.success(
             data = categories,
