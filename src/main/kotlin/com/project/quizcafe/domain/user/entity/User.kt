@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val id: Long = 0,
     @Column(name = "login_email", nullable = false, unique = true)
     val loginEmail: String,
     @Column(nullable = false)

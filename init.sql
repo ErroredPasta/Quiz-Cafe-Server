@@ -98,6 +98,8 @@ CREATE TABLE quiz_solving (
     answer TEXT NOT NULL,
     explanation TEXT,
     memo TEXT,
+    user_answer TEXT, -- 사용자가 작성한 정답
+    is_correct BOOLEAN NOT NULL, -- 정답 여부 (true = 맞음, false = 틀림)
     completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT fk_qs_quiz_book_solving FOREIGN KEY (quiz_book_solving_id) REFERENCES quiz_book_solving(id),
     CONSTRAINT fk_qs_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id),

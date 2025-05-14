@@ -53,7 +53,6 @@ class AuthServiceImpl(
         val encodedPassword = passwordEncoder.encode(request.password)
 
         val user = User(
-            null,
             loginEmail = request.loginEmail,
             password = encodedPassword,
             nickName = request.nickName,
