@@ -1,9 +1,11 @@
 package com.project.quizcafe.domain.quizbook.service
 
 import com.project.quizcafe.domain.auth.security.UserDetailsImpl
+import com.project.quizcafe.domain.quiz.repository.QuizRepository
 import com.project.quizcafe.domain.quizbook.dto.request.CreateQuizBookRequest
 import com.project.quizcafe.domain.quizbook.dto.request.UpdateQuizBookRequest
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookResponse
+import com.project.quizcafe.domain.quizbook.dto.response.QuizSummary
 import com.project.quizcafe.domain.quizbook.entity.QuizBook
 import com.project.quizcafe.domain.quizbook.repository.QuizBookRepository
 import com.project.quizcafe.domain.user.entity.User
@@ -16,7 +18,8 @@ import java.util.*
 @Service
 class QuizBookServiceImpl(
     private val quizBookRepository: QuizBookRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val quizRepository: QuizRepository
 ) : QuizBookService {
 
     @Transactional
@@ -34,14 +37,54 @@ class QuizBookServiceImpl(
         return quizBookRepository.save(newQuizBook)
     }
 
-    override fun getQuizBooksByCategory(category: String): List<GetQuizBookResponse> {
+    override fun getQuizBooksByCategory(category: String, user: User): List<GetQuizBookResponse> {
         val quizBooks = quizBookRepository.findByCategory(category)
-        return quizBooks.map { GetQuizBookResponse.from(it) }
+        return quizBooks.map { quizBook ->
+            val quizzes = quizRepository.findAllByQuizBookId(quizBook.id)
+            val quizSummaries = quizzes.map { quiz ->
+                QuizSummary(
+                    quizId = quiz.id,
+                    quizContent = quiz.content,
+                    quizType = quiz.questionType
+                )
+            }
+            val nickname = quizBook.createdBy?.nickName
+            GetQuizBookResponse(
+                id = quizBook.id,
+                version = quizBook.version,
+                category = quizBook.category,
+                title = quizBook.title,
+                description = quizBook.description,
+                level = quizBook.level,
+                createdBy = nickname,
+                quizSummaries = quizSummaries
+            )
+        }
     }
 
     override fun getMyQuizBooks(user: User): List<GetQuizBookResponse> {
         val quizBooks = quizBookRepository.findByCreatedBy(user)
-        return quizBooks.map { GetQuizBookResponse.from(it) }
+        return quizBooks.map { quizBook ->
+            val quizzes = quizRepository.findAllByQuizBookId(quizBook.id)
+            val quizSummaries = quizzes.map { quiz ->
+                QuizSummary(
+                    quizId = quiz.id,
+                    quizContent = quiz.content,
+                    quizType = quiz.questionType
+                )
+            }
+            val nickname = quizBook.createdBy?.nickName
+            GetQuizBookResponse(
+                id = quizBook.id,
+                version = quizBook.version,
+                category = quizBook.category,
+                title = quizBook.title,
+                description = quizBook.description,
+                level = quizBook.level,
+                createdBy = nickname,
+                quizSummaries = quizSummaries
+            )
+        }
     }
 
     @Transactional

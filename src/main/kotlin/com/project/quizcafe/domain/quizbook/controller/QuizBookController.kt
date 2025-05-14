@@ -37,10 +37,11 @@ class QuizBookController(
     @GetMapping
     @Operation(summary = "카테고리로 퀴즈북 조회", description = "카테고리에 해당하는 퀴즈북 조회")
     fun getQuizBooksByCategoryOfMine(
-        @RequestParam category: String
+        @RequestParam category: String,
+        @AuthenticationPrincipal principal: UserDetailsImpl
     ): ResponseEntity<ApiResponse<List<GetQuizBookResponse>?>> {
 
-        val result = quizBookService.getQuizBooksByCategory(category)
+        val result = quizBookService.getQuizBooksByCategory(category, principal.getUser())
 
         return ApiResponseFactory.success(
             data = result,

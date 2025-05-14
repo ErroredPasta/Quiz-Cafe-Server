@@ -9,17 +9,9 @@ data class GetQuizBookResponse(
     val category: String,
     val title: String,
     val description: String,
-    val level: QuizLevel
+    val level: QuizLevel,
+    val createdBy: String?=null,
+    val quizSummaries: List<QuizSummary>
 ) {
-    companion object {
-        fun from(entity: QuizBook): GetQuizBookResponse =
-            GetQuizBookResponse(
-                id = entity.id,
-                version = entity.version, // 🔹 매핑
-                category = entity.category,
-                title = entity.title,
-                description = entity.description,
-                level = entity.level
-            )
-    }
+
 }

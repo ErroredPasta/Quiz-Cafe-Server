@@ -11,7 +11,7 @@ interface QuizBookService {
     fun createQuizBook(request: CreateQuizBookRequest): QuizBook
     fun getQuizBook(id: Long): Optional<QuizBook>
 
-    fun getQuizBooksByCategory(category: String): List<GetQuizBookResponse>
+    fun getQuizBooksByCategory(category: String, user: User): List<GetQuizBookResponse>
     fun getMyQuizBooks(user: User): List<GetQuizBookResponse>
 
     fun updateQuizBook(id: Long, request: UpdateQuizBookRequest, user: User)
