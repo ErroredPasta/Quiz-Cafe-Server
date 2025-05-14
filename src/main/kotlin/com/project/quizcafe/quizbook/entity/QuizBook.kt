@@ -11,6 +11,9 @@ class QuizBook(
     var id: Long = 0,
 
     @Column(nullable = false)
+    var version: Long = 1,
+
+    @Column(nullable = false)
     var category: String,
 
     @Column(nullable = false)

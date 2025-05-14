@@ -57,6 +57,7 @@ class QuizBookServiceImpl(
         request.category?.let { quizBook.category = it }
         request.title?.let { quizBook.title = it }
         request.description?.let { quizBook.description = it }
+        quizBook.version++
 
     }
 

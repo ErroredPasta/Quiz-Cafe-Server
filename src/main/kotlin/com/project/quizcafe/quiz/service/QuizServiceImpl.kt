@@ -38,7 +38,8 @@ class QuizServiceImpl(
                 questionType = quiz.questionType,
                 content = quiz.content,
                 answer = quiz.answer,
-                explanation = quiz.explanation
+                explanation = quiz.explanation,
+                version = quiz.version
             )
         }
     }
@@ -58,6 +59,8 @@ class QuizServiceImpl(
         request.content?.let { quiz.content = it }
         request.answer?.let { quiz.answer = it }
         request.explanation?.let { quiz.explanation = it }
+        quiz.version++
+        quiz.quizBook.version++
     }
 
     override fun deleteQuiz(quizId: Long) {

@@ -71,6 +71,9 @@ class McqOptionServiceImpl(
         request.isCorrect?.let { mcqOption.isCorrect = it }
 
         mcqOptionRepository.save(mcqOption) // 변경된 내용 저장
+
+        mcqOption.quiz.version++
+        mcqOption.quiz.quizBook.version++
     }
 
 

@@ -26,6 +26,7 @@ CREATE TABLE email_verification (
 
 CREATE TABLE quiz_book (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    version BIGINT NOT NULL,
     category VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -39,6 +40,7 @@ CREATE TABLE quiz_book (
 CREATE TABLE quiz (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     quiz_book_id BIGINT NOT NULL,
+    version BIGINT NOT NULL,
     question_type ENUM('MCQ', 'SHORT_ANSWER', 'OX') NOT NULL,
     content TEXT NOT NULL,
     answer TEXT NOT NULL,
@@ -72,6 +74,7 @@ CREATE TABLE quiz_book_solving (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     quiz_book_id BIGINT NOT NULL,
+    version BIGINT NOT NULL,
     category VARCHAR(255) NOT NULL, -- 카테고리
     title VARCHAR(255) NOT NULL,    -- 제목
     description TEXT,               -- 설명
@@ -87,6 +90,7 @@ CREATE TABLE quiz_solving (
     quiz_book_solving_id BIGINT NOT NULL,
     quiz_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
+    version BIGINT NOT NULL,
     question_type ENUM('MCQ', 'SHORT_ANSWER', 'OX') NOT NULL,
     content TEXT NOT NULL,
     answer TEXT NOT NULL,

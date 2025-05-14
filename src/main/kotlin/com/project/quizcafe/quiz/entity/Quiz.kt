@@ -11,6 +11,9 @@ class Quiz(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
+    @Column(nullable = false)
+    var version: Long = 1,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_book_id", nullable = false)
     val quizBook: QuizBook,
