@@ -1,5 +1,6 @@
 package com.project.quizcafe.quiz.dto.response
 
+import com.project.quizcafe.quiz.entity.McqOption
 import com.project.quizcafe.quiz.entity.QuestionType
 
 data class QuizResponse(
@@ -9,5 +10,6 @@ data class QuizResponse(
     val content: String,
     val answer: String,
     val explanation: String?,
-    val version: Long
+    val version: Long,
+    val mcqOption: List<McqOptionResponse>?
 )

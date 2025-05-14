@@ -3,7 +3,9 @@ package com.project.quizcafe.quiz.service
 import com.project.quizcafe.auth.security.UserDetailsImpl
 import com.project.quizcafe.quiz.dto.request.CreateQuizRequest
 import com.project.quizcafe.quiz.dto.request.UpdateQuizRequest
+import com.project.quizcafe.quiz.dto.response.McqOptionResponse
 import com.project.quizcafe.quiz.dto.response.QuizResponse
+import com.project.quizcafe.quiz.entity.QuestionType
 import com.project.quizcafe.quiz.entity.Quiz
 import com.project.quizcafe.quiz.repository.QuizRepository
 import com.project.quizcafe.quizbook.repository.QuizBookRepository
@@ -15,7 +17,8 @@ import org.springframework.stereotype.*
 @Transactional
 class QuizServiceImpl(
     private val quizRepository: QuizRepository,
-    private val quizBookRepository: QuizBookRepository
+    private val quizBookRepository: QuizBookRepository,
+    private val mcqOptionService: McqOptionService
 ) : QuizService{
     override fun createQuiz(request: CreateQuizRequest): Long {
         val quiz = Quiz(
@@ -32,6 +35,10 @@ class QuizServiceImpl(
     override fun getQuizzesByQuizBookId(quizBookId: Long): List<QuizResponse> {
         val quizzes = quizRepository.findAllByQuizBookId(quizBookId)
         return quizzes.map { quiz ->
+            var mcqOptionList: List<McqOptionResponse>? = null
+            if(quiz.questionType== QuestionType.MCQ){
+                mcqOptionList = mcqOptionService.getMcqOptionsByQuizId(quiz.id)
+            }
             QuizResponse(
                 id = quiz.id,
                 quizBookId = quiz.quizBook.id,
@@ -39,7 +46,8 @@ class QuizServiceImpl(
                 content = quiz.content,
                 answer = quiz.answer,
                 explanation = quiz.explanation,
-                version = quiz.version
+                version = quiz.version,
+                mcqOption = mcqOptionList
             )
         }
     }
