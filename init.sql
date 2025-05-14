@@ -29,6 +29,7 @@ CREATE TABLE quiz_book (
     version BIGINT NOT NULL,
     category VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
+    level ENUM('EASY', 'MEDIUM', 'HARD') NOT NULL,
     description TEXT,
     created_by BIGINT,  -- NULL 가능하도록 설정
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -65,9 +66,9 @@ CREATE TABLE quiz_book_bookmark (
     user_id BIGINT NOT NULL,
     quiz_book_id BIGINT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user(id),
-    CONSTRAINT fk_quiz_book FOREIGN KEY (quiz_book_id) REFERENCES quiz_book(id),
-    CONSTRAINT unique_user_quiz_book UNIQUE (user_id, quiz_book_id) -- 같은 사용자가 같은 퀴즈북을 두 번 북마크할 수 없게
+    CONSTRAINT fk_qbb_user FOREIGN KEY (user_id) REFERENCES user(id),
+    CONSTRAINT fk_qbb_quiz_book FOREIGN KEY (quiz_book_id) REFERENCES quiz_book(id),
+    CONSTRAINT unique_user_quiz_book UNIQUE (user_id, quiz_book_id)  -- 중복 북마크 방지
 );
 
 CREATE TABLE quiz_book_solving (
@@ -75,6 +76,7 @@ CREATE TABLE quiz_book_solving (
     user_id BIGINT NOT NULL,
     quiz_book_id BIGINT NOT NULL,
     version BIGINT NOT NULL,
+    level ENUM('EASY', 'MEDIUM', 'HARD') NOT NULL,
     category VARCHAR(255) NOT NULL, -- 카테고리
     title VARCHAR(255) NOT NULL,    -- 제목
     description TEXT,               -- 설명
@@ -95,6 +97,7 @@ CREATE TABLE quiz_solving (
     content TEXT NOT NULL,
     answer TEXT NOT NULL,
     explanation TEXT,
+    memo TEXT,
     completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT fk_qs_quiz_book_solving FOREIGN KEY (quiz_book_solving_id) REFERENCES quiz_book_solving(id),
     CONSTRAINT fk_qs_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id),
