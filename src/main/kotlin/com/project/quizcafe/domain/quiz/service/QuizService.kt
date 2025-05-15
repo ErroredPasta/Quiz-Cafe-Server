@@ -7,6 +7,7 @@ import com.project.quizcafe.domain.quiz.dto.response.QuizResponse
 interface QuizService {
     fun createQuiz(request: CreateQuizRequest): Long
     fun getQuizzesByQuizBookId(quizBookId: Long): List<QuizResponse>
+    fun getQuizzesByQuizId(quizId: Long) : QuizResponse
     fun updateQuiz(quizId: Long, request: UpdateQuizRequest)
     fun deleteQuiz(quizId: Long)
 

@@ -31,12 +31,22 @@ class QuizController(
     }
 
 
-    @GetMapping("/{quizBookId}")
+    @GetMapping
     @Operation(summary = "퀴즈북 ID로 퀴즈 목록 조회", description = "특정 퀴즈북에 속한 모든 퀴즈를 조회합니다.")
-    fun getQuizzesByQuizBookId(@PathVariable quizBookId: Long): ResponseEntity<ApiResponse<List<QuizResponse>?>> {
+    fun getQuizzesByQuizBookId(@RequestParam quizBookId: Long): ResponseEntity<ApiResponse<List<QuizResponse>?>> {
         val quizzes = quizService.getQuizzesByQuizBookId(quizBookId)
         return ApiResponseFactory.success(
             data = quizzes,
+            message = "퀴즈 조회 성공"
+        )
+    }
+
+    @GetMapping("/{quizId}")
+    @Operation(summary = "퀴즈 ID로 퀴즈 목록 조회", description = "퀴즈 ID로 퀴즈를 조회합니다.")
+    fun getQuizzesByQuizId(@RequestParam quizId: Long): ResponseEntity<ApiResponse<QuizResponse?>> {
+        val quiz = quizService.getQuizzesByQuizId(quizId)
+        return ApiResponseFactory.success(
+            data = quiz,
             message = "퀴즈 조회 성공"
         )
     }

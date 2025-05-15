@@ -52,6 +52,26 @@ class QuizServiceImpl(
         }
     }
 
+    override fun getQuizzesByQuizId(quizId: Long) : QuizResponse {
+        val quiz = quizRepository.findById(quizId)
+            .orElseThrow { IllegalArgumentException("퀴즈를 찾을 수 없습니다. id=$quizId") }
+
+        var mcqOptionList: List<McqOptionResponse>? = null
+        if(quiz.questionType== QuestionType.MCQ){
+            mcqOptionList = mcqOptionService.getMcqOptionsByQuizId(quiz.id)
+        }
+        return QuizResponse(
+            id = quiz.id,
+            quizBookId = quiz.quizBook.id,
+            questionType = quiz.questionType,
+            content = quiz.content,
+            answer = quiz.answer,
+            explanation = quiz.explanation,
+            version = quiz.version,
+            mcqOption = mcqOptionList
+        )
+    }
+
     override fun updateQuiz(quizId: Long, request: UpdateQuizRequest) {
         val quiz = quizRepository.findById(quizId)
             .orElseThrow { IllegalArgumentException("퀴즈를 찾을 수 없습니다. id=$quizId") }
