@@ -4,10 +4,6 @@
     <bytecodeTargetLevel target="17" />
   </component>
   <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="quizcafe" options="-parameters" />
-      <module name="quizcafe.main" options="-parameters" />
-      <module name="quizcafe.test" options="-parameters" />
-    </option>
+    <option name="ADDITIONAL_OPTIONS_STRING" value="-parameters" />
   </component>
 </project>

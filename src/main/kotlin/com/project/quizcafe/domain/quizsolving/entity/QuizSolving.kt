@@ -26,22 +26,6 @@ data class QuizSolving(
     @JoinColumn(name = "user_id")
     val user: User,
 
-    @Column(nullable = false)
-    val version: Long,
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    val questionType: QuestionType,
-
-    @Column(nullable = false)
-    val content: String,
-
-    @Column(nullable = false)
-    val answer: String,
-
-    @Column(nullable = true)
-    val explanation: String?,
-
     @Column(nullable = true)
     var memo: String?,
 

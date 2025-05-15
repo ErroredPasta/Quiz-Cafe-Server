@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface QuizSolvingRepository : JpaRepository<QuizSolving, Long> {
     fun findByQuizBookSolvingId(quizBookSolvingId: Long): List<QuizSolving>
+    fun findByQuizBookSolvingIdAndQuizId(quizBookSolvingId: Long, quizId: Long): QuizSolving?
+
 }

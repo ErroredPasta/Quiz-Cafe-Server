@@ -9,6 +9,7 @@ import com.project.quizcafe.domain.quizbooksolving.dto.response.QuizBookSolvingR
 import com.project.quizcafe.domain.quizbooksolving.service.QuizBookSolvingService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*
 class QuizBookSolvingController(
     private val quizBookSolvingService: QuizBookSolvingService
 ) {
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     @PostMapping
     @Operation(summary = "문제집 풀이 생성", description = "사용자가 문제집 풀이를 생성합니다.")
@@ -27,7 +29,7 @@ class QuizBookSolvingController(
         @AuthenticationPrincipal principal: UserDetailsImpl,
         @RequestBody request: CreateQuizBookSolvingRequest
     ): ResponseEntity<ApiResponse<Long?>> {
-        val quizBookSolving = quizBookSolvingService.createQuizBookSolving(request)
+        val quizBookSolving = quizBookSolvingService.createQuizBookSolving(request, principal.getUser())
         return ApiResponseFactory.success(
             data = quizBookSolving.id,
             message = "문제집 풀이 생성 성공",
@@ -60,6 +62,20 @@ class QuizBookSolvingController(
     @Operation(summary = "특정 유저의 모든 문제집 풀이 조회", description = "특정 유저의 모든 문제집 풀이를 조회합니다.")
     fun getAllByUserId(@AuthenticationPrincipal principal: UserDetailsImpl): ResponseEntity<ApiResponse<List<QuizBookSolvingResponse>?>> {
         val responses = quizBookSolvingService.getAllByUserId(principal.getUser().id)
+
+        return ApiResponseFactory.success(
+            data = responses,
+            message = "특정 유저의 모든 문제집 풀이 조회 성공"
+        )
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "id에 해당하는 문제집 풀이 조회", description = "id에 해당하는 문제집 풀이를 조회합니다.")
+    fun getAllByUserId(
+        @PathVariable id: Long,
+        @AuthenticationPrincipal principal: UserDetailsImpl
+    ): ResponseEntity<ApiResponse<QuizBookSolvingResponse?>> {
+        val responses = quizBookSolvingService.getQuizBookSolvingById(id)
         return ApiResponseFactory.success(
             data = responses,
             message = "특정 유저의 모든 문제집 풀이 조회 성공"

@@ -8,7 +8,6 @@ data class QuizSolvingResponse(
     val id: Long,
     val quizBookSolvingId: Long,
     val quizId: Long,
-    val version: Long,
     val questionType: QuestionType,
     val content: String,
     val answer: String,

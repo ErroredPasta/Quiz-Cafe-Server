@@ -1,7 +1,10 @@
 package com.project.quizcafe.domain.quizbooksolving.service
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.project.quizcafe.domain.auth.security.UserDetailsImpl
-import com.project.quizcafe.domain.quiz.entity.QuestionType
+import com.project.quizcafe.domain.quiz.repository.McqOptionRepository
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
 import com.project.quizcafe.domain.quizbooksolving.dto.request.CreateQuizBookSolvingRequest
 import com.project.quizcafe.domain.quizbooksolving.entity.QuizBookSolving
@@ -11,12 +14,15 @@ import com.project.quizcafe.domain.quizbooksolving.dto.request.UpdateQuizBookSol
 import com.project.quizcafe.domain.quizbooksolving.dto.response.QuizBookSolvingResponse
 import com.project.quizcafe.domain.quizsolving.dto.response.McqOptionSolvingResponse
 import com.project.quizcafe.domain.quizsolving.dto.response.QuizSolvingResponse
-import com.project.quizcafe.domain.quizsolving.entity.McqOptionSolving
 import com.project.quizcafe.domain.quizsolving.entity.QuizSolving
 import com.project.quizcafe.domain.quizsolving.repository.McqOptionSolvingRepository
 import com.project.quizcafe.domain.quizsolving.repository.QuizSolvingRepository
-import com.project.quizcafe.domain.quizsolving.service.McqOptionSolvingService
+import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.user.repository.UserRepository
+import com.project.quizcafe.domain.versioncontrol.dto.SavedQuizBook
+import com.project.quizcafe.domain.versioncontrol.entity.Vc
+import com.project.quizcafe.domain.versioncontrol.repository.VcRepository
+import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,13 +34,14 @@ class QuizBookSolvingService(
     private val quizBookRepository: QuizBookRepository,
     private val quizSolvingRepository: QuizSolvingRepository,
     private val quizRepository: QuizRepository,
-    private val mcqOptionSolvingRepository: McqOptionSolvingRepository,
     private val userRepository: UserRepository,
+    private val vcRepository: VcRepository,
+    private val mcqOptionRepository: McqOptionRepository
 ) {
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     @Transactional
-    fun createQuizBookSolving(request: CreateQuizBookSolvingRequest): QuizBookSolving {
-        val user = (SecurityContextHolder.getContext().authentication.principal as UserDetailsImpl).getUser()
+    fun createQuizBookSolving(request: CreateQuizBookSolvingRequest, user: User): QuizBookSolving {
 
         val quizBook = quizBookRepository.findById(request.quizBookId)
             .orElseThrow { RuntimeException("퀴즈북을 찾을 수 없습니다. id=${request.quizBookId}") }
@@ -43,10 +50,6 @@ class QuizBookSolvingService(
             user = user,
             quizBook = quizBook,
             version = request.version,
-            level = request.level,
-            category = request.category,
-            title = request.title,
-            description = request.description,
             totalQuizzes = request.totalQuizzes,
             correctCount = request.correctCount,
             completedAt = request.completedAt
@@ -62,11 +65,6 @@ class QuizBookSolvingService(
                 quizBookSolving = savedQuizBookSolving,
                 quiz = quiz,
                 user = user,
-                version = quizRequest.version,
-                questionType = QuestionType.valueOf(quizRequest.questionType),
-                content = quizRequest.content,
-                answer = quizRequest.answer,
-                explanation = quizRequest.explanation,
                 memo = quizRequest.memo,
                 userAnswer = quizRequest.userAnswer,
                 isCorrect = quizRequest.isCorrect,
@@ -74,18 +72,6 @@ class QuizBookSolvingService(
             )
 
             quizSolvingRepository.save(quizSolving)
-
-            if (quizSolving.questionType == QuestionType.MCQ) {
-                val mcqOptions = quizRequest.mcqOptions?.map { option ->
-                    McqOptionSolving(
-                        quizSolving = quizSolving,
-                        optionNumber = option.optionNumber,
-                        optionContent = option.optionContent,
-                        isCorrect = option.isCorrect
-                    )
-                }
-                mcqOptions?.let { mcqOptionSolvingRepository.saveAll(it) }
-            }
         }
 
         return savedQuizBookSolving
@@ -121,56 +107,134 @@ class QuizBookSolvingService(
     }
 
     fun getAllByUserId(userId: Long): List<QuizBookSolvingResponse> {
-        val user = userRepository.findById(userId)
-            .orElseThrow { RuntimeException("유저를 찾을 수 없습니다. id=$userId") }
+        try {
+            val user = userRepository.findById(userId)
+                .orElseThrow { RuntimeException("유저를 찾을 수 없습니다. id=$userId") }
 
-        return quizBookSolvingRepository.findByUserId(userId).map { quizBookSolving ->
-            val quizSolvings = quizSolvingRepository.findByQuizBookSolvingId(quizBookSolving.id)
+            val quizBookSolvings = quizBookSolvingRepository.findByUserId(userId) // 이 부분 확인 필요
 
-            val quizSolvingResponses = quizSolvings.map { quizSolving ->
-                val mcqOptionEntities = mcqOptionSolvingRepository.findByQuizSolvingId(quizSolving.id)
-                val mcqOptionResponses = mcqOptionEntities.map { option ->
-                    McqOptionSolvingResponse(
-                        id = option.id,
-                        quizSolvingId = quizSolving.id,
-                        optionNumber = option.optionNumber,
-                        optionContent = option.optionContent,
-                        isCorrect = option.isCorrect
+            return quizBookSolvings.map { quizBookSolving ->
+
+                val quizBookValue = vcRepository.findByQuizBookIdAndVersion(quizBookSolving.quizBook.id, quizBookSolving.version)
+
+                val objectMapper = jacksonObjectMapper()
+                val savedQuizBook: SavedQuizBook = objectMapper.readValue(quizBookValue?.quizzesValue ?: "")
+
+                val quizSolvingResponses = savedQuizBook.quizzes.map { savedQuiz ->
+                    val quiz = quizRepository.findById(savedQuiz.id)
+                        .orElseThrow { RuntimeException("퀴즈를 찾을 수 없습니다.") }
+                    val quizSolving = quizSolvingRepository.findById(quiz.id)
+                        .orElseThrow { RuntimeException("퀴즈 풀이를 찾을 수 없습니다.") }
+
+                    val mcqOptions = mcqOptionRepository.findByQuizId(quiz.id)
+
+                    val mcqOptionResponses = mcqOptions.map { option ->
+                        McqOptionSolvingResponse(
+                            id = option.id,
+                            quizSolvingId = savedQuiz.id,
+                            optionNumber = option.optionNumber,
+                            optionContent = option.optionContent,
+                            isCorrect = option.isCorrect
+                        )
+                    }
+
+                    QuizSolvingResponse(
+                        id = savedQuiz.id,
+                        quizBookSolvingId = quizBookSolving.id,
+                        quizId = quiz.id,
+                        questionType = savedQuiz.questionType,
+                        content = savedQuiz.content,
+                        answer = savedQuiz.answer,
+                        explanation = savedQuiz.explanation,
+                        memo = quizSolving.memo,
+                        userAnswer = quizSolving.userAnswer,
+                        isCorrect = quizSolving.isCorrect,
+                        completedAt = quizSolving.completedAt,
+                        mcqOptions = mcqOptionResponses
                     )
                 }
 
-                QuizSolvingResponse(
-                    id = quizSolving.id,
-                    quizBookSolvingId = quizBookSolving.id,
-                    quizId = quizSolving.quiz.id,
-                    version = quizSolving.version,
-                    questionType = quizSolving.questionType,
-                    content = quizSolving.content,
-                    answer = quizSolving.answer,
-                    explanation = quizSolving.explanation,
-                    memo = quizSolving.memo,
-                    userAnswer = quizSolving.userAnswer,
-                    isCorrect = quizSolving.isCorrect,
-                    completedAt = quizSolving.completedAt,
-                    mcqOptions = mcqOptionResponses
+                QuizBookSolvingResponse(
+                    id = quizBookSolving.id,
+                    userId = user.id,
+                    quizBookId = quizBookSolving.quizBook.id,
+                    version = quizBookSolving.version,
+                    level = savedQuizBook.level,
+                    category = savedQuizBook.category,
+                    title = savedQuizBook.title,
+                    description = savedQuizBook.description,
+                    totalQuizzes = quizBookSolving.totalQuizzes,
+                    correctCount = quizBookSolving.correctCount,
+                    completedAt = quizBookSolving.completedAt,
+                    quizzes = quizSolvingResponses
+                )
+            }
+        } catch (e: Exception) {
+            log.error("getAllByUserId 처리 중 예외 발생", e)
+            throw e
+        }
+    }
+
+
+    fun getQuizBookSolvingById(id: Long): QuizBookSolvingResponse {
+        val quizBookSolving = quizBookSolvingRepository.findById(id)
+            .orElseThrow { RuntimeException("퀴즈북 풀이 결과를 찾을 수 없습니다. id=$id") }
+
+        val quizBookValue = vcRepository.findByQuizBookIdAndVersion(
+            quizBookSolving.quizBook.id,
+            quizBookSolving.version
+        ) ?: throw RuntimeException("퀴즈북 버전을 찾을 수 없습니다.")
+
+        val savedQuizBook: SavedQuizBook = jacksonObjectMapper()
+            .readValue(quizBookValue.quizzesValue)
+
+        val quizSolvingResponses = savedQuizBook.quizzes.map { savedQuiz ->
+            val quiz = quizRepository.findById(savedQuiz.id)
+                .orElseThrow { RuntimeException("퀴즈를 찾을 수 없습니다. id=${savedQuiz.id}") }
+
+            val quizSolving = quizSolvingRepository.findByQuizBookSolvingIdAndQuizId(quizBookSolving.id, quiz.id)
+                ?: throw RuntimeException("퀴즈 풀이를 찾을 수 없습니다. quizId=${quiz.id}")
+
+            val mcqOptionResponses = mcqOptionRepository.findByQuizId(quiz.id).map { option ->
+                McqOptionSolvingResponse(
+                    id = option.id,
+                    quizSolvingId = savedQuiz.id,
+                    optionNumber = option.optionNumber,
+                    optionContent = option.optionContent,
+                    isCorrect = option.isCorrect
                 )
             }
 
-            QuizBookSolvingResponse(
-                id = quizBookSolving.id,
-                userId = user.id,
-                quizBookId = quizBookSolving.quizBook.id,
-                version = quizBookSolving.version,
-                level = quizBookSolving.level,
-                category = quizBookSolving.category,
-                title = quizBookSolving.title,
-                description = quizBookSolving.description,
-                totalQuizzes = quizBookSolving.totalQuizzes,
-                correctCount = quizBookSolving.correctCount,
-                completedAt = quizBookSolving.completedAt,
-                quizzes = quizSolvingResponses
+            QuizSolvingResponse(
+                id = quizSolving.id,
+                quizBookSolvingId = quizBookSolving.id,
+                quizId = quiz.id,
+                questionType = savedQuiz.questionType,
+                content = savedQuiz.content,
+                answer = savedQuiz.answer,
+                explanation = savedQuiz.explanation,
+                memo = quizSolving.memo,
+                userAnswer = quizSolving.userAnswer,
+                isCorrect = quizSolving.isCorrect,
+                completedAt = quizSolving.completedAt,
+                mcqOptions = mcqOptionResponses
             )
         }
+
+        return QuizBookSolvingResponse(
+            id = quizBookSolving.id,
+            userId = quizBookSolving.user.id,
+            quizBookId = quizBookSolving.quizBook.id,
+            version = quizBookSolving.version,
+            level = savedQuizBook.level,
+            category = savedQuizBook.category,
+            title = savedQuizBook.title,
+            description = savedQuizBook.description,
+            totalQuizzes = quizBookSolving.totalQuizzes,
+            correctCount = quizBookSolving.correctCount,
+            completedAt = quizBookSolving.completedAt,
+            quizzes = quizSolvingResponses
+        )
     }
 
 }

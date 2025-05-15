@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 @SpringBootApplication
 @EnableScheduling
 @EnableTransactionManagement
-class QuizcafeApplication
+class QuizCafeApplication
 
 fun main(args: Array<String>) {
-	runApplication<QuizcafeApplication>(*args)
+	runApplication<QuizCafeApplication>(*args)
 }

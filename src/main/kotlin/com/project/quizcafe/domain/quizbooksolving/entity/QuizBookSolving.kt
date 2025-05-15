@@ -23,19 +23,6 @@ class QuizBookSolving(
     @Column(nullable = false)
     var version: Long,
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    var level: QuizLevel,
-
-    @Column(nullable = false)
-    var category: String,
-
-    @Column(nullable = false)
-    var title: String,
-
-    @Column(columnDefinition = "TEXT")
-    var description: String? = null,
-
     @Column(nullable = false)
     var totalQuizzes: Int,
 

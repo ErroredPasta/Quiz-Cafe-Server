@@ -4,7 +4,6 @@ import java.time.LocalDateTime
 
 data class CreateQuizSolvingRequest(
     val quizId: Long,
-    val version: Long,
     val questionType: String,  // 'MCQ', 'SHORT_ANSWER', 'OX'
     val content: String,
     val answer: String,

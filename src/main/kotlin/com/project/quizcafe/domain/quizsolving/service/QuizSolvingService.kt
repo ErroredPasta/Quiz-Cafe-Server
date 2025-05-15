@@ -29,39 +29,41 @@ class QuizSolvingService(
     private val mcqOptionSolvingRepository: McqOptionSolvingRepository,
 ) {
 
-    fun createQuizSolving(request: CreateSingleQuizSolvingRequest, user: User): QuizSolving {
-        val quizSolving = QuizSolving(
-            quizBookSolving = quizBookSolvingRepository.findById(request.quizBookSolvingId).get(),
-            quiz = quizRepository.findById(request.quizId).get(),
-            user = user,
-            version = request.version,
-            questionType = QuestionType.valueOf(request.questionType),
-            content = request.content,
-            answer = request.answer,
-            explanation = request.explanation,
-            memo = request.memo,
-            userAnswer = request.userAnswer,
-            isCorrect = request.isCorrect,
-            completedAt = request.completedAt
-        )
-
-        val saved = quizSolvingRepository.save(quizSolving)
-        if (quizSolving.questionType == QuestionType.MCQ) {
-            request.mcqOptions?.map { option ->
-                McqOptionSolving(
-                    quizSolving = quizSolving,
-                    optionNumber = option.optionNumber,
-                    optionContent = option.optionContent,
-                    isCorrect = option.isCorrect
-                )
-            }
-        }
-
-        return saved
-    }
+//    fun createQuizSolving(request: CreateSingleQuizSolvingRequest, user: User): QuizSolving {
+//        val quizSolving = QuizSolving(
+//            quizBookSolving = quizBookSolvingRepository.findById(request.quizBookSolvingId).get(),
+//            quiz = quizRepository.findById(request.quizId).get(),
+//            user = user,
+//            version = request.version,
+//            questionType = QuestionType.valueOf(request.questionType),
+//            content = request.content,
+//            answer = request.answer,
+//            explanation = request.explanation,
+//            memo = request.memo,
+//            userAnswer = request.userAnswer,
+//            isCorrect = request.isCorrect,
+//            completedAt = request.completedAt
+//        )
+//
+//        val saved = quizSolvingRepository.save(quizSolving)
+//        if (quizSolving.questionType == QuestionType.MCQ) {
+//            request.mcqOptions?.map { option ->
+//                McqOptionSolving(
+//                    quizSolving = quizSolving,
+//                    optionNumber = option.optionNumber,
+//                    optionContent = option.optionContent,
+//                    isCorrect = option.isCorrect
+//                )
+//            }
+//        }
+//
+//        return saved
+//    }
 
     fun getQuizSolving(id: Long): QuizSolvingResponse {
         val quizSolving = quizSolvingRepository.findById(id)
+            .orElseThrow { RuntimeException("QuizSolving not found with id $id") }
+        val quiz = quizRepository.findById(quizSolving.quiz.id)
             .orElseThrow { RuntimeException("QuizSolving not found with id $id") }
 
         val currentUser = (SecurityContextHolder.getContext().authentication.principal as UserDetailsImpl).getUser()
@@ -74,11 +76,10 @@ class QuizSolvingService(
             id = quizSolving.id,
             quizBookSolvingId = quizSolving.quizBookSolving.id,
             quizId = quizSolving.quiz.id,
-            version = quizSolving.version,
-            questionType = quizSolving.questionType,
-            content = quizSolving.content,
-            answer = quizSolving.answer,
-            explanation = quizSolving.explanation,
+            questionType = quiz.questionType,
+            content = quiz.content,
+            answer = quiz.answer,
+            explanation = quiz.explanation,
             memo = quizSolving.memo,
             userAnswer = quizSolving.userAnswer,
             isCorrect = quizSolving.isCorrect,

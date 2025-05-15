@@ -13,6 +13,7 @@ import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.user.repository.UserRepository
 import com.project.quizcafe.domain.versioncontrol.repository.VcRepository
 import com.project.quizcafe.domain.versioncontrol.service.VcService
+import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -37,11 +38,18 @@ class QuizBookServiceImpl(
             createdBy = user,
             level = request.level
         )
-        return quizBookRepository.save(newQuizBook)
+        val saved: QuizBook = quizBookRepository.save(newQuizBook)
+
+        vcService.save(saved.id, saved.version)
+
+        return saved
     }
 
     override fun getQuizBooksByCategory(category: String, user: User): List<GetQuizBookResponse> {
-        val quizBooks = quizBookRepository.findByCategory(category)
+        val log = LoggerFactory.getLogger(this::class.java)
+
+        val quizBooks = quizBookRepository.findAllByCategory(category)
+
         return quizBooks.map { quizBook ->
             val quizzes = quizRepository.findAllByQuizBookId(quizBook.id)
 
@@ -114,13 +122,13 @@ class QuizBookServiceImpl(
             }
         }
 
-        vcService.save(quizBook.id, quizBook.version)
-
         request.category?.let { quizBook.category = it }
         request.title?.let { quizBook.title = it }
         request.description?.let { quizBook.description = it }
         request.level?.let { quizBook.level = it }
         quizBook.version++
+
+        vcService.save(quizBook.id, quizBook.version)
 
     }
 

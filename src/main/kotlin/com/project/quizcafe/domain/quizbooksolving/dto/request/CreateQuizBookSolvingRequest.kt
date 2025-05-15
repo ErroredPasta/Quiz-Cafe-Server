@@ -7,10 +7,6 @@ import java.time.LocalDateTime
 data class CreateQuizBookSolvingRequest(
     val quizBookId: Long,
     val version: Long,
-    val level: QuizLevel,
-    val category: String,
-    val title: String,
-    val description: String?,
     val totalQuizzes: Int,
     val correctCount: Int,
     val completedAt: LocalDateTime = LocalDateTime.now(),

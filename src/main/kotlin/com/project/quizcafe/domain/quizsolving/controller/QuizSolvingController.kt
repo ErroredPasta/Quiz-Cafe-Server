@@ -22,19 +22,19 @@ class QuizSolvingController(
     private val quizSolvingService: QuizSolvingService
 ) {
 
-    @PostMapping
-    @Operation(summary = "퀴즈 풀이 생성", description = "사용자가 퀴즈 풀이를 생성")
-    fun createQuizSolving(
-        @AuthenticationPrincipal principal: UserDetailsImpl,
-        @RequestBody request: CreateSingleQuizSolvingRequest
-    ): ResponseEntity<ApiResponse<Long?>> {
-        val quizSolving = quizSolvingService.createQuizSolving(request, principal.getUser())
-        return ApiResponseFactory.success(
-            data = quizSolving.id,
-            message = "퀴즈 풀이 생성 성공",
-            status = HttpStatus.CREATED
-        )
-    }
+//    @PostMapping
+//    @Operation(summary = "퀴즈 풀이 생성", description = "사용자가 퀴즈 풀이를 생성")
+//    fun createQuizSolving(
+//        @AuthenticationPrincipal principal: UserDetailsImpl,
+//        @RequestBody request: CreateSingleQuizSolvingRequest
+//    ): ResponseEntity<ApiResponse<Long?>> {
+//        val quizSolving = quizSolvingService.createQuizSolving(request, principal.getUser())
+//        return ApiResponseFactory.success(
+//            data = quizSolving.id,
+//            message = "퀴즈 풀이 생성 성공",
+//            status = HttpStatus.CREATED
+//        )
+//    }
 
     @GetMapping("/{id}")
     @Operation(summary = "퀴즈 풀이 조회", description = "특정 퀴즈 풀이를 조회합니다.")
