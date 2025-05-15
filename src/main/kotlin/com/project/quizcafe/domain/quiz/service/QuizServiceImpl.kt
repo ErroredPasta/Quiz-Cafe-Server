@@ -9,6 +9,7 @@ import com.project.quizcafe.domain.quiz.entity.QuestionType
 import com.project.quizcafe.domain.quiz.entity.Quiz
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
 import com.project.quizcafe.domain.quizbook.repository.QuizBookRepository
+import com.project.quizcafe.domain.versioncontrol.service.VcService
 import jakarta.transaction.Transactional
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.*
@@ -18,7 +19,8 @@ import org.springframework.stereotype.*
 class QuizServiceImpl(
     private val quizRepository: QuizRepository,
     private val quizBookRepository: QuizBookRepository,
-    private val mcqOptionService: McqOptionService
+    private val mcqOptionService: McqOptionService,
+    private val vcService: VcService
 ) : QuizService{
     override fun createQuiz(request: CreateQuizRequest): Long {
         val quiz = Quiz(
@@ -46,7 +48,6 @@ class QuizServiceImpl(
                 content = quiz.content,
                 answer = quiz.answer,
                 explanation = quiz.explanation,
-                version = quiz.version,
                 mcqOption = mcqOptionList
             )
         }
@@ -67,7 +68,6 @@ class QuizServiceImpl(
             content = quiz.content,
             answer = quiz.answer,
             explanation = quiz.explanation,
-            version = quiz.version,
             mcqOption = mcqOptionList
         )
     }
@@ -84,10 +84,13 @@ class QuizServiceImpl(
             throw IllegalArgumentException("수정 권한이 없습니다.")
         }
 
+        val quizBook = quizBookRepository.findById(quiz.quizBook.id)
+            .orElseThrow { IllegalArgumentException("문제집을 찾을 수 없습니다.") }
+        vcService.save(quizBook.id, quizBook.version)
+
         request.content?.let { quiz.content = it }
         request.answer?.let { quiz.answer = it }
         request.explanation?.let { quiz.explanation = it }
-        quiz.version++
         quiz.quizBook.version++
     }
 

@@ -115,6 +115,12 @@ CREATE TABLE mcq_option_solving (
     CONSTRAINT fk_mos_quiz_solving FOREIGN KEY (quiz_solving_id) REFERENCES quiz_solving(id)
 );
 
+CREATE TABLE version (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    quiz_book_id BIGINT NOT NULL,
+    version BIGINT NOT NULL,
+    value TEXT
+);
 
 -- 데이터 확인
 SELECT * FROM quiz_book;

@@ -9,4 +9,5 @@ interface McqOptionService {
     fun updateMcqOption(id: Long, request: UpdateMcqOptionRequest)
     fun deleteMcqOption(id: Long)
     fun getMcqOptionsByQuizId(quizId: Long): List<McqOptionResponse>
+    fun getMcqOptionsById(quizId: Long): McqOptionResponse
 }

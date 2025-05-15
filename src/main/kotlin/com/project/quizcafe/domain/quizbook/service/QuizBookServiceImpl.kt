@@ -11,6 +11,8 @@ import com.project.quizcafe.domain.quizbook.entity.QuizBook
 import com.project.quizcafe.domain.quizbook.repository.QuizBookRepository
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.user.repository.UserRepository
+import com.project.quizcafe.domain.versioncontrol.repository.VcRepository
+import com.project.quizcafe.domain.versioncontrol.service.VcService
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,7 +21,8 @@ import java.util.*
 @Service
 class QuizBookServiceImpl(
     private val quizBookRepository: QuizBookRepository,
-    private val quizRepository: QuizRepository
+    private val quizRepository: QuizRepository,
+    private val vcService: VcService
 ) : QuizBookService {
 
     @Transactional
@@ -110,6 +113,8 @@ class QuizBookServiceImpl(
                 throw IllegalArgumentException("문제집을 수정할 권한이 없습니다.")
             }
         }
+
+        vcService.save(quizBook.id, quizBook.version)
 
         request.category?.let { quizBook.category = it }
         request.title?.let { quizBook.title = it }

@@ -51,10 +51,20 @@ class McqOptionController(
         )
     }
 
-    @GetMapping("/{quizId}")
+    @GetMapping
     @Operation(summary = "퀴즈 ID로 객관식 보기 조회", description = "특정 퀴즈에 속한 모든 객관식 보기를 조회합니다.")
-    fun getMcqOptionsByQuizId(@PathVariable quizId: Long): ResponseEntity<ApiResponse<List<McqOptionResponse>?>> {
+    fun getMcqOptionsByQuizId(@RequestParam quizId: Long): ResponseEntity<ApiResponse<List<McqOptionResponse>?>> {
         val response = mcqOptionService.getMcqOptionsByQuizId(quizId)
+        return ApiResponseFactory.success(
+            data = response,
+            message = "객관식 보기 조회 성공"
+        )
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "객관식 보기 ID로 객관식 보기 조회", description = "객관식 보기 ID로 객관식 보기를 조회합니다.")
+    fun getMcqOptionsById(@PathVariable id: Long): ResponseEntity<ApiResponse<McqOptionResponse?>> {
+        val response = mcqOptionService.getMcqOptionsById(id)
         return ApiResponseFactory.success(
             data = response,
             message = "객관식 보기 조회 성공"

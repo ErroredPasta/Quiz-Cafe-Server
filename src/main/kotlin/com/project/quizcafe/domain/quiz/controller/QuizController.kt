@@ -42,7 +42,7 @@ class QuizController(
     }
 
     @GetMapping("/{quizId}")
-    @Operation(summary = "퀴즈 ID로 퀴즈 목록 조회", description = "퀴즈 ID로 퀴즈를 조회합니다.")
+    @Operation(summary = "퀴즈 ID로 퀴즈 조회", description = "퀴즈 ID로 퀴즈를 조회합니다.")
     fun getQuizzesByQuizId(@RequestParam quizId: Long): ResponseEntity<ApiResponse<QuizResponse?>> {
         val quiz = quizService.getQuizzesByQuizId(quizId)
         return ApiResponseFactory.success(

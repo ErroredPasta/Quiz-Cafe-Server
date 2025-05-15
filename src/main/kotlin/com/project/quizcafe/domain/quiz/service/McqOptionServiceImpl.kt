@@ -7,6 +7,7 @@ import com.project.quizcafe.domain.quiz.dto.response.McqOptionResponse
 import com.project.quizcafe.domain.quiz.entity.McqOption
 import com.project.quizcafe.domain.quiz.repository.McqOptionRepository
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
+import com.project.quizcafe.domain.versioncontrol.service.VcService
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class McqOptionServiceImpl(
     private val mcqOptionRepository: McqOptionRepository,
-    private val quizRepository: QuizRepository
+    private val quizRepository: QuizRepository,
+    private val vcService: VcService
 ) : McqOptionService {
 
     override fun createMcqOption(request: CreateMcqOptionRequest): McqOptionResponse {
@@ -66,13 +68,14 @@ class McqOptionServiceImpl(
             throw IllegalArgumentException("퀴즈북의 생성자만 수정할 수 있습니다.")
         }
 
+        vcService.save(quizBook.id, quizBook.version)
+
         // 수정할 수 있는 값만 수정
         request.optionContent?.let { mcqOption.optionContent = it }
         request.isCorrect?.let { mcqOption.isCorrect = it }
 
         mcqOptionRepository.save(mcqOption) // 변경된 내용 저장
 
-        mcqOption.quiz.version++
         mcqOption.quiz.quizBook.version++
     }
 
@@ -109,5 +112,18 @@ class McqOptionServiceImpl(
                 isCorrect = mcqOption.isCorrect
             )
         }
+    }
+
+    override fun getMcqOptionsById(quizId: Long): McqOptionResponse {
+        val mcqOption = mcqOptionRepository.findById(quizId)
+            .orElseThrow { IllegalArgumentException("객관식 보기 옵션을 찾을 수 없습니다.") }
+
+        return McqOptionResponse(
+            id = mcqOption.id,
+            quizId = mcqOption.quiz.id,
+            optionNumber = mcqOption.optionNumber,
+            optionContent = mcqOption.optionContent,
+            isCorrect = mcqOption.isCorrect
+        )
     }
 }
