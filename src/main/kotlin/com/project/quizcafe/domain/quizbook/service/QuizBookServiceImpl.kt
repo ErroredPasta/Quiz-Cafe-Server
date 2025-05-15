@@ -4,6 +4,7 @@ import com.project.quizcafe.domain.auth.security.UserDetailsImpl
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
 import com.project.quizcafe.domain.quizbook.dto.request.CreateQuizBookRequest
 import com.project.quizcafe.domain.quizbook.dto.request.UpdateQuizBookRequest
+import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookAndQuizSummaryResponse
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookResponse
 import com.project.quizcafe.domain.quizbook.dto.response.QuizSummary
 import com.project.quizcafe.domain.quizbook.entity.QuizBook
@@ -18,7 +19,6 @@ import java.util.*
 @Service
 class QuizBookServiceImpl(
     private val quizBookRepository: QuizBookRepository,
-    private val userRepository: UserRepository,
     private val quizRepository: QuizRepository
 ) : QuizBookService {
 
@@ -41,13 +41,7 @@ class QuizBookServiceImpl(
         val quizBooks = quizBookRepository.findByCategory(category)
         return quizBooks.map { quizBook ->
             val quizzes = quizRepository.findAllByQuizBookId(quizBook.id)
-            val quizSummaries = quizzes.map { quiz ->
-                QuizSummary(
-                    quizId = quiz.id,
-                    quizContent = quiz.content,
-                    quizType = quiz.questionType
-                )
-            }
+
             val nickname = quizBook.createdBy?.nickName
             GetQuizBookResponse(
                 id = quizBook.id,
@@ -57,22 +51,41 @@ class QuizBookServiceImpl(
                 description = quizBook.description,
                 level = quizBook.level,
                 createdBy = nickname,
-                quizSummaries = quizSummaries
+                totalQuizzes = quizzes.size
             )
         }
     }
+
+    override fun getQuizBookById(id: Long, user: User): GetQuizBookAndQuizSummaryResponse {
+        val quizBook = quizBookRepository.findById(id)
+            .orElseThrow { IllegalArgumentException("해당 ID의 퀴즈북이 존재하지 않습니다: $id") }
+        val quizzes = quizRepository.findAllByQuizBookId(quizBook.id)
+        val quizSummaries = quizzes.map { quiz ->
+            QuizSummary(
+                quizId = quiz.id,
+                quizContent = quiz.content,
+                quizType = quiz.questionType
+            )
+        }
+        val nickname = quizBook.createdBy?.nickName
+
+        return GetQuizBookAndQuizSummaryResponse(
+            id = quizBook.id,
+            version = quizBook.version,
+            category = quizBook.category,
+            title = quizBook.title,
+            description = quizBook.description,
+            level = quizBook.level,
+            createdBy = nickname,
+            quizzes = quizSummaries
+        )
+    }
+
 
     override fun getMyQuizBooks(user: User): List<GetQuizBookResponse> {
         val quizBooks = quizBookRepository.findByCreatedBy(user)
         return quizBooks.map { quizBook ->
             val quizzes = quizRepository.findAllByQuizBookId(quizBook.id)
-            val quizSummaries = quizzes.map { quiz ->
-                QuizSummary(
-                    quizId = quiz.id,
-                    quizContent = quiz.content,
-                    quizType = quiz.questionType
-                )
-            }
             val nickname = quizBook.createdBy?.nickName
             GetQuizBookResponse(
                 id = quizBook.id,
@@ -82,13 +95,13 @@ class QuizBookServiceImpl(
                 description = quizBook.description,
                 level = quizBook.level,
                 createdBy = nickname,
-                quizSummaries = quizSummaries
+                totalQuizzes = quizzes.size
             )
         }
     }
 
     @Transactional
-    override fun updateQuizBook(id: Long, request: UpdateQuizBookRequest, user: User){
+    override fun updateQuizBook(id: Long, request: UpdateQuizBookRequest, user: User) {
         val quizBook = quizBookRepository.findById(id)
             .orElseThrow { IllegalArgumentException("문제집을 찾을 수 없습니다.") }
 

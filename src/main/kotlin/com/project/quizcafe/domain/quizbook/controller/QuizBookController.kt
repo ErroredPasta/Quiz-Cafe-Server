@@ -6,6 +6,7 @@ import com.project.quizcafe.common.response.ApiResponseFactory
 import com.project.quizcafe.domain.quizbook.dto.request.CreateQuizBookRequest
 import com.project.quizcafe.domain.quizbook.dto.request.UpdateQuizBookRequest
 import com.project.quizcafe.domain.quizbook.dto.response.GetAllCategoriesResponse
+import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookAndQuizSummaryResponse
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookResponse
 import com.project.quizcafe.domain.quizbook.entity.QuizCategory
 import com.project.quizcafe.domain.quizbook.service.QuizBookService
@@ -43,6 +44,18 @@ class QuizBookController(
 
         val result = quizBookService.getQuizBooksByCategory(category, principal.getUser())
 
+        return ApiResponseFactory.success(
+            data = result,
+            message = "문제집 조회 성공"
+        )
+    }
+
+    @GetMapping("/{quizBookId}")
+    fun getQuizBookById(
+        @AuthenticationPrincipal principal: UserDetailsImpl,
+        @PathVariable quizBookId: Long,
+    ): ResponseEntity<ApiResponse<GetQuizBookAndQuizSummaryResponse?>> {
+        val result = quizBookService.getQuizBookById(quizBookId, principal.getUser())
         return ApiResponseFactory.success(
             data = result,
             message = "문제집 조회 성공"

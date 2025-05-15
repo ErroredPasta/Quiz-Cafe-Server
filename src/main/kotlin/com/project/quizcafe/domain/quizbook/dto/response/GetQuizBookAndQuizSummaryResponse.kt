@@ -2,7 +2,7 @@ package com.project.quizcafe.domain.quizbook.dto.response
 
 import com.project.quizcafe.domain.quizbook.entity.QuizLevel
 
-data class GetQuizBookResponse(
+data class GetQuizBookAndQuizSummaryResponse (
     val id: Long,
     val version: Long, // 🔹 버전 필드 추가
     val category: String,
@@ -10,7 +10,5 @@ data class GetQuizBookResponse(
     val description: String,
     val level: QuizLevel,
     val createdBy: String? =null,
-    val totalQuizzes: Int
-) {
-
-}
+    val quizzes : List<QuizSummary>
+)
