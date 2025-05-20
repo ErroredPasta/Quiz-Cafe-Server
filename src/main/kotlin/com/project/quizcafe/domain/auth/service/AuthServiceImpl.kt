@@ -100,6 +100,10 @@ class AuthServiceImpl(
             }
         }
 
+        if (!toMail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) {
+            throw BadRequestException("잘못된 이메일 형식입니다.")
+        }
+
         // 인증 코드 생성
         val verificationCode = Random.nextInt(100000, 1000000).toString()
 
@@ -134,6 +138,13 @@ class AuthServiceImpl(
             mailSender.send(mimeMessage)
 
         } catch (e: MailException) {
+            val msg = e.message ?: ""
+
+            if (msg.contains("Invalid Addresses") || msg.contains("550") || msg.contains("Recipient address rejected")) {
+                // 실제 존재하지 않는 이메일일 가능성 있음
+                throw BadRequestException("존재하지 않는 이메일 주소입니다.")
+            }
+
             throw InternalServerErrorException("이메일 전송 중 오류가 발생했습니다.")
         } catch (e: Exception) {
             throw InternalServerErrorException("이메일 생성 중 오류가 발생했습니다.")
