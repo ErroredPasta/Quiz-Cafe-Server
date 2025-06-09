@@ -87,7 +87,8 @@ class QuizBookServiceImpl(
         val ownerId = quizBook.createdBy?.id
         val totalSaves = quizBookBookmarkRepository.findAllByQuizBookId(quizBook.id).size
         val avgCorrectCount = quizBookSolvingRepository.findAvgCorrectCountByQuizBookId(quizBook.id) ?: 0.0
-
+        val isSaved = quizBookBookmarkRepository
+            .findByUserIdAndQuizBookId(user.id, quizBook.id) != null
 
         return GetQuizBookAndQuizSummaryResponse(
             id = quizBook.id,
@@ -102,7 +103,8 @@ class QuizBookServiceImpl(
             totalSaves = totalSaves,
             averageCorrectCount = avgCorrectCount,
             ownerId = ownerId,
-            views = 0//나중에수정
+            views = 0,//나중에수정,
+            isSaved=isSaved
         )
     }
 
