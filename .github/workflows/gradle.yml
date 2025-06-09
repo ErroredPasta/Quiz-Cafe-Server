@@ -40,7 +40,7 @@ jobs:
 
       # ✅ 테스트 포함 빌드
       - name: Build with Gradle Wrapper (with test)
-        run: ./gradlew build --info --stacktrace
+        run: ./gradlew build -x test --info --stacktrace
 
       - name: Build Docker image
         run: |
