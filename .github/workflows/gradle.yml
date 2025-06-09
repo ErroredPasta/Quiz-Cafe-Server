@@ -80,13 +80,12 @@ jobs:
 
       - name: Run new container with env
         run: |
-          echo "Running new container..."
           sudo docker run -d -p 80:8080 \
             -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
             -e JWT_EXPIRATION="${{ secrets.JWT_EXPIRATION }}" \
             -e MAIL_USERNAME="${{ secrets.MAIL_USERNAME }}" \
             -e MAIL_PASSWORD="${{ secrets.MAIL_PASSWORD }}" \
-            -e DB_URL="${{ secrets.DB_URL }}" \
+            -e DB_URL='${{ secrets.DB_URL }}' \
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
             -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
             -e SERVER_PORT="${{ secrets.SERVER_PORT }}" \
