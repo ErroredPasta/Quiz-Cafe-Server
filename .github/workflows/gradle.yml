@@ -38,8 +38,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Build with Gradle Wrapper (without test)
-        run: ./gradlew build -x test
+      # ✅ 테스트 포함 빌드
+      - name: Build with Gradle Wrapper (with test)
+        run: ./gradlew build --info --stacktrace
 
       - name: Build Docker image
         run: |
