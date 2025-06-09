@@ -15,6 +15,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Gradle 캐시 설정
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -28,14 +39,12 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle Wrapper (without test)
-        run: |
-          echo "Building with Gradle..."
-          ./gradlew build -x test
+        run: ./gradlew build -x test
 
       - name: Build Docker image
         run: |
           echo "Building Docker image..."
-          docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server .
 
       - name: Docker login
         uses: docker/login-action@v2
@@ -44,9 +53,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Docker push
-        run: |
-          echo "Pushing Docker image to Docker Hub..."
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
 
   run-docker-image-on-ec2:
     needs: build
@@ -61,7 +68,7 @@ jobs:
       - name: Stop old container if exists
         run: |
           echo "Checking for old containers..."
-          if [ $(sudo docker ps -a -q -f name=quiz-cafe-server) ]; then
+          if [ "$(sudo docker ps -a -q -f name=quiz-cafe-server)" ]; then
             echo "Stopping old container..."
             sudo docker stop quiz-cafe-server
             echo "Removing old container..."
@@ -73,7 +80,7 @@ jobs:
       - name: Run new container with env
         run: |
           echo "Running new container..."
-          sudo docker run -it -d -p 80:8080 \
+          sudo docker run -d -p 80:8080 \
             -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
             -e JWT_EXPIRATION="${{ secrets.JWT_EXPIRATION }}" \
             -e MAIL_USERNAME="${{ secrets.MAIL_USERNAME }}" \
