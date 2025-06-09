@@ -8,7 +8,9 @@ import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookAndQuizSumma
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookResponse
 import com.project.quizcafe.domain.quizbook.dto.response.QuizSummary
 import com.project.quizcafe.domain.quizbook.entity.QuizBook
+import com.project.quizcafe.domain.quizbook.repository.QuizBookBookmarkRepository
 import com.project.quizcafe.domain.quizbook.repository.QuizBookRepository
+import com.project.quizcafe.domain.quizbooksolving.repository.QuizBookSolvingRepository
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.user.repository.UserRepository
 import com.project.quizcafe.domain.versioncontrol.repository.VcRepository
@@ -23,8 +25,10 @@ import java.util.*
 class QuizBookServiceImpl(
     private val quizBookRepository: QuizBookRepository,
     private val quizRepository: QuizRepository,
-    private val vcService: VcService
-) : QuizBookService {
+    private val vcService: VcService,
+    private val quizBookBookmarkRepository: QuizBookBookmarkRepository,
+    private val quizBookSolvingRepository: QuizBookSolvingRepository,
+    ) : QuizBookService {
 
     @Transactional
     override fun createQuizBook(request: CreateQuizBookRequest): QuizBook {
@@ -62,7 +66,8 @@ class QuizBookServiceImpl(
                 description = quizBook.description,
                 level = quizBook.level,
                 createdBy = nickname,
-                totalQuizzes = quizzes.size
+                totalQuizzes = quizzes.size,
+                createdAt = quizBook.createdAt
             )
         }
     }
@@ -79,6 +84,10 @@ class QuizBookServiceImpl(
             )
         }
         val nickname = quizBook.createdBy?.nickName
+        val ownerId = quizBook.createdBy?.id
+        val totalSaves = quizBookBookmarkRepository.findAllByQuizBookId(quizBook.id).size
+        val avgCorrectCount = quizBookSolvingRepository.findAvgCorrectCountByQuizBookId(quizBook.id) ?: 0.0
+
 
         return GetQuizBookAndQuizSummaryResponse(
             id = quizBook.id,
@@ -88,7 +97,12 @@ class QuizBookServiceImpl(
             description = quizBook.description,
             level = quizBook.level,
             createdBy = nickname,
-            quizzes = quizSummaries
+            quizzes = quizSummaries,
+            createdAt = quizBook.createdAt,
+            totalSaves = totalSaves,
+            averageCorrectCount = avgCorrectCount,
+            ownerId = ownerId,
+            views = 0//나중에수정
         )
     }
 
@@ -106,7 +120,8 @@ class QuizBookServiceImpl(
                 description = quizBook.description,
                 level = quizBook.level,
                 createdBy = nickname,
-                totalQuizzes = quizzes.size
+                totalQuizzes = quizzes.size,
+                createdAt = quizBook.createdAt
             )
         }
     }

@@ -9,4 +9,6 @@ interface QuizBookBookmarkRepository : JpaRepository<QuizBookBookmark, Long> {
     fun findByUserIdAndQuizBookId(userId: Long, quizBookId: Long): QuizBookBookmark?
     fun findAllByUserId(userId: Long): List<QuizBookBookmark>
     fun deleteByUserIdAndQuizBookId(userId: Long, quizBookId: Long)
+    fun findAllByQuizBookId(quizBookId: Long): List<QuizBookBookmark>
+
 }

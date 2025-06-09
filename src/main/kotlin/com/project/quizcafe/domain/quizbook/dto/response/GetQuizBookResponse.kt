@@ -1,6 +1,7 @@
 package com.project.quizcafe.domain.quizbook.dto.response
 
 import com.project.quizcafe.domain.quizbook.entity.QuizLevel
+import java.time.LocalDateTime
 
 data class GetQuizBookResponse(
     val id: Long,
@@ -10,7 +11,8 @@ data class GetQuizBookResponse(
     val description: String,
     val level: QuizLevel,
     val createdBy: String? =null,
-    val totalQuizzes: Int
+    val totalQuizzes: Int,
+    val createdAt: LocalDateTime
 ) {
 
 }
