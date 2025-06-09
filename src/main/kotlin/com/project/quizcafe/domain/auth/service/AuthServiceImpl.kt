@@ -39,6 +39,7 @@ class AuthServiceImpl(
     private lateinit var senderEmail: String
 
     override fun signUp(request: SignUpRequest) {
+
         if (!request.loginEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) {
             throw BadRequestException("잘못된 이메일 형식입니다.")
         }
