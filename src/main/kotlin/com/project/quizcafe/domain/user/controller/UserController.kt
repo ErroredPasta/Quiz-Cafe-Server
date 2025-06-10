@@ -11,6 +11,7 @@ import com.project.quizcafe.domain.user.dto.response.UserInfoResponse
 import com.project.quizcafe.domain.user.service.UserService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -27,9 +28,11 @@ class UserController(
 
     @PatchMapping("password")
     @Operation(summary = "비밀번호 변경", description = "사용자가 자신의 비밀번호를 변경하는 API")
-    fun changePassword(@RequestBody request: ChangePasswordRequest): ResponseEntity<ApiResponse<Unit?>> {
-        val username = SecurityContextHolder.getContext().authentication.name
-        userService.changePassword(username, request.oldPassword, request.newPassword)
+    fun changePassword(
+        @AuthenticationPrincipal principal: UserDetailsImpl,
+        @Valid @RequestBody request: ChangePasswordRequest
+    ): ResponseEntity<ApiResponse<Unit?>> {
+        userService.changePassword(principal.getUser().nickName, request.oldPassword, request.newPassword)
         return ApiResponseFactory.success(
             message = "비밀번호 변경 성공",
             status = HttpStatus.OK
@@ -61,7 +64,7 @@ class UserController(
     @Operation(summary = "회원 정보 수정", description = "사용자가 자신의 정보를 수정하는 API")
     fun updateUserInfo(
         @AuthenticationPrincipal principal: UserDetailsImpl,
-        @RequestBody request: UpdateUserInfoRequest
+        @Valid @RequestBody request: UpdateUserInfoRequest
     ): ResponseEntity<ApiResponse<Unit?>> {
         userService.updateUserInfo(principal.getUser(), request)
         return ApiResponseFactory.success(

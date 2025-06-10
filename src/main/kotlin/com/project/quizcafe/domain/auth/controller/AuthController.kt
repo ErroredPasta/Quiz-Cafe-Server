@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -135,7 +137,7 @@ class AuthController(
             )
         ]
     )
-    fun verifyCode(@RequestBody request: VerifyCodeRequest): ResponseEntity<ApiResponse<Unit?>> {
+    fun verifyCode(@Valid @RequestBody request: VerifyCodeRequest): ResponseEntity<ApiResponse<Unit?>> {
         authService.verifyCode(request.toMail, request.code)
         return ApiResponseFactory.success(
             message = "인증 성공"
@@ -159,7 +161,12 @@ class AuthController(
             )
         ]
     )
-    fun resetPassword(@RequestParam email: String): ResponseEntity<ApiResponse<Unit?>> {
+    fun resetPassword(
+        @RequestParam
+        @Email(message = "올바른 이메일 형식이어야 합니다.")
+        @NotBlank(message = "이메일을 입력하세요.")
+        email: String
+    ): ResponseEntity<ApiResponse<Unit?>> {
         authService.resetPassword(email)
         return ApiResponseFactory.success(
             message = "비밀번호 재설정 성공"
