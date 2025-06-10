@@ -56,7 +56,7 @@ class UserController(
         userService.deleteUser(principal.getUser())
         return ApiResponseFactory.success(
             message = "회원 탈퇴 성공",
-            status = HttpStatus.OK
+            status = HttpStatus.NO_CONTENT
         )
     }
 

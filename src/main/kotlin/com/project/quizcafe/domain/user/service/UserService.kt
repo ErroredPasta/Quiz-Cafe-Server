@@ -5,7 +5,8 @@ import com.project.quizcafe.domain.auth.validator.EmailValidator
 import com.project.quizcafe.domain.user.dto.request.UpdateUserInfoRequest
 import com.project.quizcafe.domain.user.dto.response.UserInfoResponse
 import com.project.quizcafe.domain.user.entity.User
-import com.project.quizcafe.domain.user.entity.toUserInfoResponse
+import com.project.quizcafe.domain.user.extensions.applyTo
+import com.project.quizcafe.domain.user.extensions.toUserInfoResponse
 import com.project.quizcafe.domain.user.repository.UserRepository
 import com.project.quizcafe.domain.user.validator.UserValidator
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -42,13 +43,7 @@ class UserService(
     }
 
     fun updateUserInfo(user: User, request: UpdateUserInfoRequest) {
-        val updatedUser = user.copy(nickName = request.nickname)
-
-        try {
-            userRepository.save(updatedUser)
-        } catch (e: Exception) {
-            throw InternalServerErrorException("회원 정보 변경 실패 ${e.message}")
-        }
+        request.applyTo(user)
     }
 
     fun getUserInfo(user: User): UserInfoResponse {

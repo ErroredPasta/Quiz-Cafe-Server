@@ -18,7 +18,7 @@ data class User(
     @Column(nullable = false)
     val password: String,
     @Column(name = "nick_name", nullable = false)
-    val nickName: String,
+    var nickName: String,
     @Enumerated(EnumType.STRING)
     val role: Role = Role.USER,
     @CreationTimestamp

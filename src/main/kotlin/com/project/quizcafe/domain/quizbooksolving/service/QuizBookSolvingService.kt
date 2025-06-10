@@ -52,7 +52,7 @@ class QuizBookSolvingService(
             version = request.version,
             totalQuizzes = request.totalQuizzes,
             correctCount = request.correctCount,
-            completedAt = request.completedAt
+            completedAt = request.completedAt,
         )
 
         val savedQuizBookSolving = quizBookSolvingRepository.save(quizBookSolving)

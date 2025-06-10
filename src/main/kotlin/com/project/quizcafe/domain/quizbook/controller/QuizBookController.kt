@@ -9,6 +9,7 @@ import com.project.quizcafe.domain.quizbook.dto.response.GetAllCategoriesRespons
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookAndQuizSummaryResponse
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookResponse
 import com.project.quizcafe.domain.quizbook.entity.QuizCategory
+import com.project.quizcafe.domain.quizbook.extentions.toGetAllCategoriesResponse
 import com.project.quizcafe.domain.quizbook.service.QuizBookService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -23,11 +24,13 @@ import org.springframework.web.bind.annotation.*
 class QuizBookController(
     private val quizBookService: QuizBookService
 ) {
-
     @PostMapping
     @Operation(summary = "퀴즈북 만들기", description = "사용자가 퀴즈북 생성")
-    fun createQuizBook(@RequestBody request: CreateQuizBookRequest): ResponseEntity<ApiResponse<Long?>> {
-        val createdQuizBook = quizBookService.createQuizBook(request)
+    fun createQuizBook(
+        @RequestBody request: CreateQuizBookRequest,
+        @AuthenticationPrincipal principal: UserDetailsImpl
+    ): ResponseEntity<ApiResponse<Long?>> {
+        val createdQuizBook = quizBookService.createQuizBook(request, principal.getUser())
         return ApiResponseFactory.success(
             data = createdQuizBook.id,
             message = "문제집 생성 성공",
@@ -41,9 +44,7 @@ class QuizBookController(
         @RequestParam category: String,
         @AuthenticationPrincipal principal: UserDetailsImpl
     ): ResponseEntity<ApiResponse<List<GetQuizBookResponse>?>> {
-
         val result = quizBookService.getQuizBooksByCategory(category, principal.getUser())
-
         return ApiResponseFactory.success(
             data = result,
             message = "문제집 조회 성공"
@@ -90,15 +91,7 @@ class QuizBookController(
     @GetMapping("/category")
     @Operation(summary = "모든 카테고리 조회", description = "모든 카테고리 조회")
     fun getAllCategories(): ResponseEntity<ApiResponse<List<GetAllCategoriesResponse>?>> {
-        // Category enum을 DTO로 변환
-        val categories = QuizCategory.entries.map { category ->
-            GetAllCategoriesResponse(
-                category = category.name,
-                name = category.categoryName,
-                group = category.group
-            )
-        }
-
+        val categories = QuizCategory.entries.map { it.toGetAllCategoriesResponse() }
         return ApiResponseFactory.success(
             data = categories,
             message = "카테고리 조회 성공",

@@ -30,5 +30,5 @@ class QuizBookSolving(
     var correctCount: Int,
 
     @Column(name = "completed_at", nullable = false)
-    var completedAt: LocalDateTime = LocalDateTime.now()
+    var completedAt: LocalDateTime = LocalDateTime.now(),
 )
