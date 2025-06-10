@@ -3,7 +3,9 @@ package com.project.quizcafe.domain.quizbook.validator
 import com.project.quizcafe.domain.quizbook.entity.QuizBookBookmark
 import com.project.quizcafe.domain.quizbook.repository.QuizBookBookmarkRepository
 import com.project.quizcafe.domain.user.entity.User
+import org.springframework.stereotype.Component
 
+@Component
 class QuizBookMarkValidator(
     private val quizBookBookmarkRepository: QuizBookBookmarkRepository
 ) {
