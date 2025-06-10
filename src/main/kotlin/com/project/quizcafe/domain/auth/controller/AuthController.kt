@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -47,7 +48,7 @@ class AuthController(
             )
         ]
     )
-    fun signup(@RequestBody request: SignUpRequest): ResponseEntity<ApiResponse<Unit?>> {
+    fun signup(@Valid @RequestBody request: SignUpRequest): ResponseEntity<ApiResponse<Unit?>> {
         authService.signUp(request)
         return ApiResponseFactory.success(
             message = "회원가입 성공",
@@ -71,7 +72,7 @@ class AuthController(
             )
         ]
     )
-    fun signIn(@RequestBody request: SignInRequest): ResponseEntity<ApiResponse<TokenResponse?>> {
+    fun signIn(@Valid @RequestBody request: SignInRequest): ResponseEntity<ApiResponse<TokenResponse?>> {
         val token = authService.signIn(request)
         return ApiResponseFactory.success(
             data = token,
@@ -109,8 +110,8 @@ class AuthController(
             )
         ]
     )
-    fun sendCode(@RequestBody request: SendCodeRequest): ResponseEntity<ApiResponse<Unit?>> {
-        authService.sendCode(request.toMail, request.type)
+    fun sendCode(@Valid @RequestBody request: SendCodeRequest): ResponseEntity<ApiResponse<Unit?>> {
+        authService.sendCode(request)
         return ApiResponseFactory.success(
             message = "메일 인증 코드 전송됨",
             status = HttpStatus.ACCEPTED

@@ -24,4 +24,15 @@ data class User(
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: LocalDateTime? = null
-)
+){
+    companion object {
+        fun createUser(loginEmail: String, encodedPassword: String, nickName: String): User {
+            return User(
+                loginEmail = loginEmail,
+                password = encodedPassword,
+                nickName = nickName,
+                role = Role.USER
+            )
+        }
+    }
+}

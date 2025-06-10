@@ -2,7 +2,9 @@ package com.project.quizcafe.common.exception
 
 import com.project.quizcafe.common.response.ApiResponseFactory
 import com.project.quizcafe.common.response.ErrorResponse
+import jakarta.validation.ConstraintViolationException
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -65,6 +67,17 @@ class GlobalExceptionHandler {
         )
     }
 
+    @ExceptionHandler(ConstraintViolationException::class)
+    fun handleConstraintViolationException(e: ConstraintViolationException): ResponseEntity<ErrorResponse> {
+        val errorMessage = e.constraintViolations.joinToString(", ") { violation ->
+            "${violation.propertyPath}: ${violation.message}"
+        }
+        return ApiResponseFactory.error(
+            message = "유효성 검사 실패: $errorMessage",
+            status = HttpStatus.BAD_REQUEST
+        )
+    }
+
     // 권한 없음 (403)
     @ExceptionHandler(AccessDeniedException::class)
     fun handleAccessDeniedException(e: AccessDeniedException): ResponseEntity<ErrorResponse> {
@@ -73,6 +86,16 @@ class GlobalExceptionHandler {
             status = HttpStatus.FORBIDDEN
         )
     }
+
+    // 데이터 무결성 위반 (409)
+    @ExceptionHandler(DataIntegrityViolationException::class)
+    fun handleDataIntegrityViolation(e: DataIntegrityViolationException): ResponseEntity<ErrorResponse> {
+        return ApiResponseFactory.error(
+            message = "데이터 무결성 제약 조건을 위반했습니다.",
+            status = HttpStatus.CONFLICT
+        )
+    }
+
 
     // 알 수 없는 예외 (500)
     @ExceptionHandler(Exception::class)
