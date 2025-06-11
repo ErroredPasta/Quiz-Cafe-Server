@@ -1,4 +1,4 @@
-package com.project.quizcafe.domain.quizbook.extentions
+package com.project.quizcafe.domain.quizbook.extensions
 
 import com.project.quizcafe.domain.quizbook.dto.response.GetAllCategoriesResponse
 import com.project.quizcafe.domain.quizbook.entity.QuizCategory

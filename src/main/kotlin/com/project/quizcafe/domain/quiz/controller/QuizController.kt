@@ -2,21 +2,23 @@ package com.project.quizcafe.domain.quiz.controller
 
 import com.project.quizcafe.common.response.ApiResponse
 import com.project.quizcafe.common.response.ApiResponseFactory
+import com.project.quizcafe.domain.auth.security.UserDetailsImpl
 import com.project.quizcafe.domain.quiz.dto.request.CreateQuizRequest
 import com.project.quizcafe.domain.quiz.dto.request.UpdateQuizRequest
 import com.project.quizcafe.domain.quiz.dto.response.QuizResponse
-import com.project.quizcafe.domain.quiz.service.QuizServiceImpl
+import com.project.quizcafe.domain.quiz.service.QuizService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/quiz")
-@Tag(name = "Quiz", description = "퀴즈 관련 API")
+@Tag(name = "04.Quiz", description = "퀴즈 관련 API")
 class QuizController(
-    private val quizService: QuizServiceImpl
+    private val quizService: QuizService
 ) {
 
     @PostMapping
@@ -25,7 +27,7 @@ class QuizController(
         val quizId = quizService.createQuiz(request)
         return ApiResponseFactory.success(
             data = quizId,
-            message = "문제집 생성 성공",
+            message = "퀴즈 생성 성공",
             status = HttpStatus.CREATED
         )
     }
@@ -37,38 +39,48 @@ class QuizController(
         val quizzes = quizService.getQuizzesByQuizBookId(quizBookId)
         return ApiResponseFactory.success(
             data = quizzes,
-            message = "퀴즈 조회 성공"
+            message = "퀴즈 조회 성공",
+            status = HttpStatus.OK
         )
     }
 
     @GetMapping("/{quizId}")
     @Operation(summary = "퀴즈 ID로 퀴즈 조회", description = "퀴즈 ID로 퀴즈를 조회합니다.")
-    fun getQuizzesByQuizId(@PathVariable quizId: Long): ResponseEntity<ApiResponse<QuizResponse?>> {
+    fun getQuizzesByQuizId(
+        @PathVariable quizId: Long
+    ): ResponseEntity<ApiResponse<QuizResponse?>> {
         val quiz = quizService.getQuizzesByQuizId(quizId)
         return ApiResponseFactory.success(
             data = quiz,
-            message = "퀴즈 조회 성공"
+            message = "퀴즈 조회 성공",
+            status = HttpStatus.OK
         )
     }
 
     @PatchMapping("/{quizId}")
     @Operation(summary = "퀴즈 수정", description = "퀴즈 ID로 수정")
     fun updateQuiz(
+        @AuthenticationPrincipal principal: UserDetailsImpl,
         @PathVariable quizId: Long,
         @RequestBody request: UpdateQuizRequest
     ): ResponseEntity<ApiResponse<Unit?>> {
-        quizService.updateQuiz(quizId, request)
+        quizService.updateQuiz(quizId, request, principal.getUser())
         return ApiResponseFactory.success(
-            message = "퀴즈 수정 성공"
+            message = "퀴즈 수정 성공",
+            status = HttpStatus.OK
         )
     }
 
     @DeleteMapping("/{quizId}")
     @Operation(summary = "퀴즈 삭제", description = "퀴즈 삭제")
-    fun deleteQuiz(@PathVariable quizId: Long): ResponseEntity<ApiResponse<Unit?>> {
-        quizService.deleteQuiz(quizId)
+    fun deleteQuiz(
+        @AuthenticationPrincipal principal: UserDetailsImpl,
+        @PathVariable quizId: Long
+    ): ResponseEntity<ApiResponse<Unit?>> {
+        quizService.deleteQuiz(quizId, principal.getUser())
         return ApiResponseFactory.success(
-            message = "퀴즈 삭제 성공"
+            message = "퀴즈 삭제 성공",
+            status = HttpStatus.NO_CONTENT
         )
     }
 }

@@ -6,19 +6,18 @@ import com.project.quizcafe.domain.quizbook.dto.request.UpdateQuizBookRequest
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookAndQuizSummaryResponse
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookResponse
 import com.project.quizcafe.domain.quizbook.entity.QuizBook
-import com.project.quizcafe.domain.quizbook.extentions.applyTo
-import com.project.quizcafe.domain.quizbook.extentions.toGetQuizBookAndQuizSummaryResponse
-import com.project.quizcafe.domain.quizbook.extentions.toGetQuizBookResponse
+import com.project.quizcafe.domain.quizbook.extensions.applyTo
+import com.project.quizcafe.domain.quizbook.extensions.toGetQuizBookAndQuizSummaryResponse
+import com.project.quizcafe.domain.quizbook.extensions.toGetQuizBookResponse
 import com.project.quizcafe.domain.quizbook.repository.QuizBookBookmarkRepository
 import com.project.quizcafe.domain.quizbook.repository.QuizBookRepository
-import com.project.quizcafe.domain.quizbook.extentions.toQuizBook
+import com.project.quizcafe.domain.quizbook.extensions.toQuizBook
 import com.project.quizcafe.domain.quizbook.validator.QuizBookValidator
 import com.project.quizcafe.domain.quizbooksolving.repository.QuizBookSolvingRepository
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.versioncontrol.service.VcService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 @Service
 class QuizBookService(

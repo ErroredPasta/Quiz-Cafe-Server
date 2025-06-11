@@ -9,7 +9,7 @@ import com.project.quizcafe.domain.quizbook.dto.response.GetAllCategoriesRespons
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookAndQuizSummaryResponse
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookResponse
 import com.project.quizcafe.domain.quizbook.entity.QuizCategory
-import com.project.quizcafe.domain.quizbook.extentions.toGetAllCategoriesResponse
+import com.project.quizcafe.domain.quizbook.extensions.toGetAllCategoriesResponse
 import com.project.quizcafe.domain.quizbook.service.QuizBookService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/quiz-book")
-@Tag(name = "QuizBook", description = "문제집 관련 API")
+@Tag(name = "03.QuizBook", description = "문제집 관련 API")
 class QuizBookController(
     private val quizBookService: QuizBookService
 ) {
@@ -47,7 +47,8 @@ class QuizBookController(
         val result = quizBookService.getQuizBooksByCategory(category, principal.getUser())
         return ApiResponseFactory.success(
             data = result,
-            message = "문제집 조회 성공"
+            message = "문제집 조회 성공",
+            status = HttpStatus.OK
         )
     }
 
@@ -59,7 +60,8 @@ class QuizBookController(
         val result = quizBookService.getQuizBookById(quizBookId, principal.getUser())
         return ApiResponseFactory.success(
             data = result,
-            message = "문제집 조회 성공"
+            message = "문제집 조회 성공",
+            status = HttpStatus.OK
         )
     }
 
@@ -72,7 +74,8 @@ class QuizBookController(
     ): ResponseEntity<ApiResponse<Unit?>> {
         quizBookService.updateQuizBook(quizBookId, request, principal.getUser())
         return ApiResponseFactory.success(
-            message = "문제집 수정 완료"
+            message = "문제집 수정 완료",
+            status = HttpStatus.OK
         )
     }
 
@@ -84,7 +87,8 @@ class QuizBookController(
     ): ResponseEntity<ApiResponse<Unit?>> {
         quizBookService.deleteQuizBook(quizBookId, principal.getUser())
         return ApiResponseFactory.success(
-            message = "문제집 삭제 성공"
+            message = "문제집 삭제 성공",
+            status = HttpStatus.NO_CONTENT
         )
     }
 

@@ -14,7 +14,7 @@ data class QuizSolvingResponse(
     val explanation: String?,
     val memo: String?,
     val userAnswer: String?,
-    val isCorrect: Boolean,
-    val completedAt: LocalDateTime,
+    val isCorrect: Boolean? = false,
+    val completedAt: LocalDateTime?  = LocalDateTime.now(),
     val mcqOptions: List<McqOptionSolvingResponse>? = null
 )

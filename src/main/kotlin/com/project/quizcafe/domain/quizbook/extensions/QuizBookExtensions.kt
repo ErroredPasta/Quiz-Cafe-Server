@@ -1,4 +1,4 @@
-package com.project.quizcafe.domain.quizbook.extentions
+package com.project.quizcafe.domain.quizbook.extensions
 
 import com.project.quizcafe.domain.quiz.entity.Quiz
 import com.project.quizcafe.domain.quizbook.entity.QuizBook

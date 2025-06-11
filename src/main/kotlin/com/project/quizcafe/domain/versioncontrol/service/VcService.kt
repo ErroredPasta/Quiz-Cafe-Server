@@ -1,6 +1,7 @@
 package com.project.quizcafe.domain.versioncontrol.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.project.quizcafe.common.exception.NotFoundException
 import com.project.quizcafe.domain.quiz.dto.response.McqOptionResponse
 import com.project.quizcafe.domain.quiz.dto.response.QuizResponse
 import com.project.quizcafe.domain.quiz.entity.QuestionType
@@ -40,7 +41,7 @@ class VcService(
         }
 
         val quizBook = quizBookRepository.findById(quizBookId)
-            .orElseThrow { RuntimeException("퀴즈북을 찾을수 없습니다.") }
+            .orElseThrow { NotFoundException("퀴즈북을 찾을수 없습니다.") }
 
         val quizBookValue = quizBook.createdBy?.let {
             SavedQuizBook(

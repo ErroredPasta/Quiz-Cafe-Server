@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/user")
-@Tag(name = "User", description = "사용자 관련 API")
+@Tag(name = "02.User", description = "사용자 관련 API")
 class UserController(
     private val userService: UserService,
     private val quizBookService: QuizBookService

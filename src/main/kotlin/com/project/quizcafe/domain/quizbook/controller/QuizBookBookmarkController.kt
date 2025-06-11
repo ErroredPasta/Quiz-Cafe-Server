@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/quiz-book-bookmark")
-@Tag(name = "quiz-book-bookmark", description = "퀴즈북 북마크 관련 API")
+@Tag(name = "06.quiz-book-bookmark", description = "퀴즈북 북마크 관련 API")
 class QuizBookBookmarkController(
     private val quizBookBookmarkService: QuizBookBookmarkService
 ) {
