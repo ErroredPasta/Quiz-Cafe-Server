@@ -1,45 +1,24 @@
 package com.project.quizcafe.domain.versioncontrol.service
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.project.quizcafe.common.exception.NotFoundException
-import com.project.quizcafe.domain.quiz.dto.response.McqOptionResponse
-import com.project.quizcafe.domain.quiz.dto.response.QuizResponse
-import com.project.quizcafe.domain.quiz.entity.QuestionType
-import com.project.quizcafe.domain.quiz.repository.QuizRepository
-import com.project.quizcafe.domain.quiz.service.McqOptionService
+import com.project.quizcafe.domain.quiz.service.QuizService
 import com.project.quizcafe.domain.quizbook.repository.QuizBookRepository
 import com.project.quizcafe.domain.versioncontrol.dto.SavedQuizBook
 import com.project.quizcafe.domain.versioncontrol.entity.Vc
 import com.project.quizcafe.domain.versioncontrol.repository.VcRepository
-import org.springframework.stereotype.Service
 import org.springframework.context.annotation.Lazy
+import org.springframework.stereotype.Service
 
 @Service
 class VcService(
     private val vcRepository: VcRepository,
-    private val quizRepository: QuizRepository,
+    @Lazy private val quizService: QuizService,
     private val quizBookRepository: QuizBookRepository,
-    @Lazy private val mcqOptionService: McqOptionService
+    private val objectMapper: ObjectMapper
 ) {
     fun save(quizBookId: Long, version: Long) {
-
-        val quizzes = quizRepository.findAllByQuizBookId(quizBookId)
-        val quizzesValue = quizzes.map { quiz ->
-            var mcqOptionList: List<McqOptionResponse>? = null
-            if (quiz.questionType == QuestionType.MCQ) {
-                mcqOptionList = mcqOptionService.getMcqOptionsByQuizId(quiz.id)
-            }
-            QuizResponse(
-                id = quiz.id,
-                quizBookId = quiz.quizBook.id,
-                questionType = quiz.questionType,
-                content = quiz.content,
-                answer = quiz.answer,
-                explanation = quiz.explanation,
-                mcqOption = mcqOptionList
-            )
-        }
-
+        val quizzes = quizService.getQuizzesByQuizBookId(quizBookId)
         val quizBook = quizBookRepository.findById(quizBookId)
             .orElseThrow { NotFoundException("퀴즈북을 찾을수 없습니다.") }
 
@@ -50,12 +29,10 @@ class VcService(
                 level = quizBook.level,
                 description = quizBook.description,
                 createdBy = it.nickName,
-                quizzes = quizzesValue
+                quizzes = quizzes
             )
         }
 
-        val objectMapper = jacksonObjectMapper()
-        //objectMapper.findAndRegisterModules()
         val quizBookJson: String = objectMapper.writeValueAsString(quizBookValue)
 
         val vc = Vc(
