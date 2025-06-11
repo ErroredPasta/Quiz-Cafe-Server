@@ -3,8 +3,6 @@ package com.project.quizcafe.domain.quizsolving.controller
 import com.project.quizcafe.common.response.ApiResponse
 import com.project.quizcafe.common.response.ApiResponseFactory
 import com.project.quizcafe.domain.auth.security.UserDetailsImpl
-import com.project.quizcafe.domain.quizsolving.dto.request.CreateQuizSolvingRequest
-import com.project.quizcafe.domain.quizsolving.dto.request.CreateSingleQuizSolvingRequest
 import com.project.quizcafe.domain.quizsolving.dto.request.UpdateQuizSolvingRequest
 import com.project.quizcafe.domain.quizsolving.dto.response.QuizSolvingResponse
 import com.project.quizcafe.domain.quizsolving.service.QuizSolvingService
@@ -17,7 +15,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/quiz-solving")
-@Tag(name = "QuizSolving", description = "퀴즈 풀이 관련 API")
+@Tag(name = "08.QuizSolving", description = "퀴즈 풀이 관련 API")
 class QuizSolvingController(
     private val quizSolvingService: QuizSolvingService
 ) {
@@ -38,32 +36,42 @@ class QuizSolvingController(
 
     @GetMapping("/{id}")
     @Operation(summary = "퀴즈 풀이 조회", description = "특정 퀴즈 풀이를 조회합니다.")
-    fun getQuizSolving(@PathVariable id: Long): ResponseEntity<ApiResponse<QuizSolvingResponse?>> {
-        val quizSolving = quizSolvingService.getQuizSolving(id)
+    fun getQuizSolving(
+        @AuthenticationPrincipal principal: UserDetailsImpl,
+        @PathVariable id: Long
+    ): ResponseEntity<ApiResponse<QuizSolvingResponse?>> {
+        val quizSolving = quizSolvingService.getQuizSolving(id, principal.getUser())
         return ApiResponseFactory.success(
             data = quizSolving,
-            message = "퀴즈 풀이 조회 성공"
+            message = "퀴즈 풀이 조회 성공",
+            status = HttpStatus.OK
         )
     }
 
     @PatchMapping("/{id}")
     @Operation(summary = "퀴즈 풀이 수정", description = "퀴즈 풀이를 수정합니다.")
     fun updateQuizSolving(
+        @AuthenticationPrincipal principal: UserDetailsImpl,
         @PathVariable id: Long,
         @RequestBody request: UpdateQuizSolvingRequest
     ): ResponseEntity<ApiResponse<Unit?>> {
-        quizSolvingService.updateQuizSolving(id, request)
+        quizSolvingService.updateQuizSolving(id, request,principal.getUser())
         return ApiResponseFactory.success(
-            message = "퀴즈 풀이 수정 성공"
+            message = "퀴즈 풀이 수정 성공",
+            status = HttpStatus.OK
         )
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "퀴즈 풀이 삭제", description = "퀴즈 풀이를 삭제합니다.")
-    fun deleteQuizSolving(@PathVariable id: Long): ResponseEntity<ApiResponse<Unit?>> {
-        quizSolvingService.deleteQuizSolving(id)
+    fun deleteQuizSolving(
+        @AuthenticationPrincipal principal: UserDetailsImpl,
+        @PathVariable id: Long
+    ): ResponseEntity<ApiResponse<Unit?>> {
+        quizSolvingService.deleteQuizSolving(id,principal.getUser())
         return ApiResponseFactory.success(
-            message = "퀴즈 풀이 삭제 성공"
+            message = "퀴즈 풀이 삭제 성공",
+            status = HttpStatus.NO_CONTENT
         )
     }
 

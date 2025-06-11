@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/quiz-book-bookmark")
-@Tag(name = "quiz-book-bookmark", description = "퀴즈북 북마크 관련 API")
+@Tag(name = "06.quiz-book-bookmark", description = "퀴즈북 북마크 관련 API")
 class QuizBookBookmarkController(
     private val quizBookBookmarkService: QuizBookBookmarkService
 ) {
@@ -21,7 +21,7 @@ class QuizBookBookmarkController(
     @PostMapping
     @Operation(summary = "퀴즈북 북마크 추가", description = "사용자가 퀴즈북을 북마크로 추가")
     fun addBookmark(@AuthenticationPrincipal principal: UserDetailsImpl, @RequestParam quizBookId: Long): ResponseEntity<ApiResponse<Long?>> {
-        val createdBookmark = principal.getUser().id?.let { quizBookBookmarkService.addBookmark(it, quizBookId) }
+        quizBookBookmarkService.addBookmark(principal.getUser(), quizBookId)
         return ApiResponseFactory.success(
             data = null,
             message = "퀴즈북 북마크 추가 성공",
@@ -32,7 +32,7 @@ class QuizBookBookmarkController(
     @DeleteMapping
     @Operation(summary = "퀴즈북 북마크 삭제", description = "사용자가 퀴즈북 북마크를 삭제")
     fun removeBookmark(@AuthenticationPrincipal principal: UserDetailsImpl, @RequestParam quizBookId: Long): ResponseEntity<ApiResponse<Nothing?>> {
-        principal.getUser().id?.let { quizBookBookmarkService.removeBookmark(it, quizBookId) }
+        quizBookBookmarkService.removeBookmark(principal.getUser().id, quizBookId)
         return ApiResponseFactory.success(
             data = null,
             message = "퀴즈북 북마크 삭제 성공",

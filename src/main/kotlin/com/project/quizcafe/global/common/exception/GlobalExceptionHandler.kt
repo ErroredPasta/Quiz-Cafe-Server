@@ -102,7 +102,7 @@ class GlobalExceptionHandler {
     fun handleGeneralException(e: Exception): ResponseEntity<ErrorResponse> {
         log.error("Unhandled exception occurred", e)
         return ApiResponseFactory.error(
-            message = "서버 오류가 발생했습니다.",
+            message = "서버 오류가 발생했습니다. ${e.message}",
             status = HttpStatus.INTERNAL_SERVER_ERROR
         )
     }

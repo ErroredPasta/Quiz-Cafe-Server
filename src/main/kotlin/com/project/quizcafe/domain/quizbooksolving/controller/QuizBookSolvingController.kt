@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/quiz-book-solving")
-@Tag(name = "QuizBookSolving", description = "퀴즈북 풀이 관련 API")
+@Tag(name = "07.QuizBookSolving", description = "퀴즈북 풀이 관련 API")
 class QuizBookSolvingController(
     private val quizBookSolvingService: QuizBookSolvingService
 ) {
@@ -40,32 +40,39 @@ class QuizBookSolvingController(
     @PatchMapping("/{id}")
     @Operation(summary = "문제집 풀이 수정", description = "문제집 풀이를 수정합니다.")
     fun updateQuizBookSolving(
+        @AuthenticationPrincipal principal: UserDetailsImpl,
         @PathVariable id: Long,
         @RequestBody request: UpdateQuizBookSolvingRequest
     ): ResponseEntity<ApiResponse<Unit?>> {
-        quizBookSolvingService.updateQuizBookSolving(id, request)
+        quizBookSolvingService.updateQuizBookSolving(id, request, principal.getUser())
         return ApiResponseFactory.success(
-            message = "문제집 풀이 수정 성공"
+            message = "문제집 풀이 수정 성공",
+            status = HttpStatus.OK
         )
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "문제집 풀이 삭제", description = "문제집 풀이를 삭제합니다.")
-    fun deleteQuizBookSolving(@PathVariable id: Long): ResponseEntity<ApiResponse<Unit?>> {
-        quizBookSolvingService.deleteQuizBookSolving(id)
+    fun deleteQuizBookSolving(
+        @AuthenticationPrincipal principal: UserDetailsImpl,
+        @PathVariable id: Long
+    ): ResponseEntity<ApiResponse<Unit?>> {
+        quizBookSolvingService.deleteQuizBookSolving(id, principal.getUser())
         return ApiResponseFactory.success(
-            message = "문제집 풀이 삭제 성공"
+            message = "문제집 풀이 삭제 성공",
+            status = HttpStatus.NO_CONTENT
         )
     }
 
     @GetMapping
     @Operation(summary = "특정 유저의 모든 문제집 풀이 조회", description = "특정 유저의 모든 문제집 풀이를 조회합니다.")
     fun getAllByUserId(@AuthenticationPrincipal principal: UserDetailsImpl): ResponseEntity<ApiResponse<List<QuizBookSolvingResponse>?>> {
-        val responses = quizBookSolvingService.getAllByUserId(principal.getUser().id)
+        val responses = quizBookSolvingService.getAllByUserId(principal.getUser())
 
         return ApiResponseFactory.success(
             data = responses,
-            message = "특정 유저의 모든 문제집 풀이 조회 성공"
+            message = "특정 유저의 모든 문제집 풀이 조회 성공",
+            status = HttpStatus.OK
         )
     }
 
@@ -78,7 +85,8 @@ class QuizBookSolvingController(
         val responses = quizBookSolvingService.getQuizBookSolvingById(id)
         return ApiResponseFactory.success(
             data = responses,
-            message = "특정 유저의 모든 문제집 풀이 조회 성공"
+            message = "특정 유저의 모든 문제집 풀이 조회 성공",
+            status = HttpStatus.OK
         )
     }
 }

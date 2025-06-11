@@ -7,6 +7,7 @@ import com.project.quizcafe.domain.auth.dto.request.SignInRequest
 import com.project.quizcafe.domain.auth.dto.request.SignUpRequest
 import com.project.quizcafe.domain.auth.dto.request.VerifyCodeRequest
 import com.project.quizcafe.domain.auth.dto.response.TokenResponse
+import com.project.quizcafe.domain.auth.security.UserDetailsImpl
 import com.project.quizcafe.domain.auth.service.AuthService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -19,11 +20,12 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Auth", description = "사용자 인증 관련 API")
+@Tag(name = "01.Auth", description = "사용자 인증 관련 API")
 class AuthController(
     private val authService: AuthService
 ) {
@@ -74,7 +76,17 @@ class AuthController(
             )
         ]
     )
-    fun signIn(@Valid @RequestBody request: SignInRequest): ResponseEntity<ApiResponse<TokenResponse?>> {
+    fun signIn(
+        //@AuthenticationPrincipal principal: UserDetailsImpl?,
+        @Valid @RequestBody request: SignInRequest
+    ): ResponseEntity<ApiResponse<TokenResponse?>> {
+//        if(principal!=null){
+//            return ApiResponseFactory.success(
+//                data = token,
+//                message = "자동 로그인 성공"
+//            )
+//        }
+
         val token = authService.signIn(request)
         return ApiResponseFactory.success(
             data = token,
