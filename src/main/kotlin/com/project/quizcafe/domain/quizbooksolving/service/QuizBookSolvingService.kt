@@ -7,17 +7,17 @@ import com.project.quizcafe.domain.quiz.repository.McqOptionRepository
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
 import com.project.quizcafe.domain.quiz.repository.getByQuizBookId
 import com.project.quizcafe.domain.quiz.validator.QuizValidator
+import com.project.quizcafe.domain.quizbook.repository.QuizBookRepository
+import com.project.quizcafe.domain.quizbook.repository.getQuizBookById
 import com.project.quizcafe.domain.quizbooksolving.dto.request.CreateQuizBookSolvingRequest
 import com.project.quizcafe.domain.quizbooksolving.entity.QuizBookSolving
 import com.project.quizcafe.domain.quizbooksolving.repository.QuizBookSolvingRepository
-import com.project.quizcafe.domain.quizbook.validator.QuizBookValidator
 import com.project.quizcafe.domain.quizbooksolving.dto.request.UpdateQuizBookSolvingRequest
 import com.project.quizcafe.domain.quizbooksolving.dto.response.QuizBookSolvingResponse
 import com.project.quizcafe.domain.quizbooksolving.extensions.applyTo
 import com.project.quizcafe.domain.quizbooksolving.extensions.toQuizBookSolving
 import com.project.quizcafe.domain.quizbooksolving.extensions.toQuizBookSolvingResponse
 import com.project.quizcafe.domain.quizbooksolving.validator.QuizBookSolvingValidator
-import com.project.quizcafe.domain.quizsolving.dto.response.McqOptionSolvingResponse
 import com.project.quizcafe.domain.quizsolving.dto.response.QuizSolvingResponse
 import com.project.quizcafe.domain.quizsolving.extensions.toQuizSolving
 import com.project.quizcafe.domain.quizsolving.extensions.toQuizSolvingResponse
@@ -38,16 +38,16 @@ class QuizBookSolvingService(
     private val quizRepository: QuizRepository,
     private val vcRepository: VcRepository,
     private val mcqOptionRepository: McqOptionRepository,
-    private val quizBookValidator: QuizBookValidator,
     private val quizValidator: QuizValidator,
     private val quizBookSolvingValidator: QuizBookSolvingValidator,
-    private val quizSolvingValidator: QuizSolvingValidator
+    private val quizSolvingValidator: QuizSolvingValidator,
+    private val quizBookRepository: QuizBookRepository
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     @Transactional
     fun createQuizBookSolving(request: CreateQuizBookSolvingRequest, user: User): QuizBookSolving {
-        val quizBook = quizBookValidator.validateQuizBookNotExist(request.quizBookId)
+        val quizBook = quizBookRepository.getQuizBookById(request.quizBookId)
 
         val quizBookSolving = request.toQuizBookSolving(user, quizBook)
         val savedQuizBookSolving = quizBookSolvingRepository.save(quizBookSolving)

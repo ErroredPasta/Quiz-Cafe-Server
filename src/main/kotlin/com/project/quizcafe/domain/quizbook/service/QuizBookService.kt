@@ -12,6 +12,7 @@ import com.project.quizcafe.domain.quizbook.extensions.toGetQuizBookResponse
 import com.project.quizcafe.domain.quizbook.repository.QuizBookBookmarkRepository
 import com.project.quizcafe.domain.quizbook.repository.QuizBookRepository
 import com.project.quizcafe.domain.quizbook.extensions.toQuizBook
+import com.project.quizcafe.domain.quizbook.repository.getQuizBookById
 import com.project.quizcafe.domain.quizbook.validator.QuizBookValidator
 import com.project.quizcafe.domain.quizbooksolving.repository.QuizBookSolvingRepository
 import com.project.quizcafe.domain.user.entity.User
@@ -49,7 +50,7 @@ class QuizBookService(
     }
 
     fun getQuizBookById(id: Long, user: User): GetQuizBookAndQuizSummaryResponse {
-        val quizBook = quizBookValidator.validateQuizBookNotExist(id)
+        val quizBook = quizBookRepository.getQuizBookById(id)
         val quizzes = quizRepository.findAllByQuizBookId(quizBook.id)
 
         val bookmarkCount = quizBookBookmarkRepository.findAllByQuizBookId(quizBook.id).size
@@ -75,7 +76,7 @@ class QuizBookService(
 
     @Transactional
     fun updateQuizBook(id: Long, request: UpdateQuizBookRequest, user: User) {
-        val quizBook = quizBookValidator.validateQuizBookNotExist(id)
+        val quizBook = quizBookRepository.getQuizBookById(id)
         quizBookValidator.validateMyQuizBook(quizBook, user)
 
         request.applyTo(quizBook)
@@ -87,7 +88,7 @@ class QuizBookService(
 
     @Transactional
     fun deleteQuizBook(id: Long, user: User) {
-        val quizBook = quizBookValidator.validateQuizBookNotExist(id)
+        val quizBook = quizBookRepository.getQuizBookById(id)
         quizBookValidator.validateMyQuizBook(quizBook, user)
 
         quizBookRepository.delete(quizBook)
