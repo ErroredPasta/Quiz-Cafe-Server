@@ -37,6 +37,9 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
+    // oauth
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+
     //swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
 

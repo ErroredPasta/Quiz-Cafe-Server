@@ -1,6 +1,8 @@
 package com.project.quizcafe.domain.auth.config
 
 import com.project.quizcafe.domain.auth.security.JwtAuthenticationFilter
+import com.project.quizcafe.domain.auth.security.oauth.CustomOAuth2UserService
+import com.project.quizcafe.domain.auth.security.oauth.OAuth2SuccessHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -14,7 +16,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 class SecurityConfig(
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val customOAuth2UserService: CustomOAuth2UserService,
+    private val oAuth2SuccessHandler: OAuth2SuccessHandler
 ) {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
@@ -22,10 +26,17 @@ class SecurityConfig(
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
-                it.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html","/v3/api-docs").permitAll()
-                it.requestMatchers("/auth/**").permitAll()
-                //it.requestMatchers("/**").permitAll()
+                it.requestMatchers(
+                    "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/v3/api-docs"
+                ).permitAll()
+                it.requestMatchers("/auth/**", "/oauth2/**").permitAll()
                 it.anyRequest().authenticated()
+            }
+            .oauth2Login {
+                it.userInfoEndpoint { endpoint ->
+                    endpoint.userService(customOAuth2UserService)
+                }
+                it.successHandler(oAuth2SuccessHandler)
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
