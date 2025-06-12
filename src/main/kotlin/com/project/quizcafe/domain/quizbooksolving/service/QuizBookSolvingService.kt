@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.project.quizcafe.domain.quiz.extensions.toSolvingResponses
 import com.project.quizcafe.domain.quiz.repository.McqOptionRepository
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
+import com.project.quizcafe.domain.quiz.repository.getByQuizBookId
 import com.project.quizcafe.domain.quiz.validator.QuizValidator
 import com.project.quizcafe.domain.quizbooksolving.dto.request.CreateQuizBookSolvingRequest
 import com.project.quizcafe.domain.quizbooksolving.entity.QuizBookSolving
@@ -52,7 +53,7 @@ class QuizBookSolvingService(
         val savedQuizBookSolving = quizBookSolvingRepository.save(quizBookSolving)
 
         request.quizzes.forEach {
-            val quiz = quizValidator.validateQuizNotExist(it.quizId)
+            val quiz = quizRepository.getByQuizBookId(it.quizId)
             val quizSolving = it.toQuizSolving(user, quiz, savedQuizBookSolving)
             quizSolvingRepository.save(quizSolving)
         }
@@ -159,7 +160,7 @@ class QuizBookSolvingService(
         savedQuizBook: SavedQuizBook
     ): List<QuizSolvingResponse> {
         return savedQuizBook.quizzes.map { savedQuiz ->
-            val quiz = quizValidator.validateQuizNotExist(savedQuiz.id)
+            val quiz = quizRepository.getByQuizBookId(savedQuiz.id)
             val quizSolving = quizSolvingRepository.findByQuizBookSolvingIdAndQuizId(quizBookSolving.id, quiz.id)
             val mcqOptions = mcqOptionRepository.findByQuizId(quiz.id)
             val mcqOptionResponses = mcqOptions.toSolvingResponses(savedQuiz.id)

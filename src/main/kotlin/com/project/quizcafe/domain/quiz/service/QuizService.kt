@@ -8,6 +8,7 @@ import com.project.quizcafe.domain.quiz.extensions.applyTo
 import com.project.quizcafe.domain.quiz.extensions.toQuiz
 import com.project.quizcafe.domain.quiz.extensions.toQuizResponse
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
+import com.project.quizcafe.domain.quiz.repository.getByQuizBookId
 import com.project.quizcafe.domain.quiz.validator.QuizValidator
 import com.project.quizcafe.domain.quizbook.repository.QuizBookRepository
 import com.project.quizcafe.domain.quizbook.validator.QuizBookValidator
@@ -42,12 +43,12 @@ class QuizService(
     }
 
     fun getQuizzesByQuizId(quizId: Long) : QuizResponse {
-        val quiz = quizValidator.validateQuizNotExist(quizId)
+        val quiz = quizRepository.getByQuizBookId(quizId)
         return quiz.toQuizResponse(mcqOptionService)
     }
 
     fun updateQuiz(quizId: Long, request: UpdateQuizRequest, currentUser: User) {
-        val quiz = quizValidator.validateQuizNotExist(quizId)
+        val quiz = quizRepository.getByQuizBookId(quizId)
         quizValidator.validateMyQuiz(quiz, currentUser)
         val quizBook = quizBookValidator.validateQuizBookNotExist(quiz.quizBook.id)
 
@@ -58,7 +59,7 @@ class QuizService(
     }
 
     fun deleteQuiz(quizId: Long, currentUser: User) {
-        val quiz = quizValidator.validateQuizNotExist(quizId)
+        val quiz = quizRepository.getByQuizBookId(quizId)
         quizValidator.validateMyQuiz(quiz, currentUser)
         quizRepository.delete(quiz)
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.project.quizcafe.domain.auth.security.UserDetailsImpl
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
+import com.project.quizcafe.domain.quiz.repository.getByQuizBookId
 import com.project.quizcafe.domain.quiz.validator.QuizValidator
 import com.project.quizcafe.domain.quizbooksolving.repository.QuizBookSolvingRepository
 import com.project.quizcafe.domain.quizsolving.dto.request.UpdateQuizSolvingRequest
@@ -36,7 +37,7 @@ class QuizSolvingService(
 ) {
     fun getQuizSolving(id: Long, currentUser: User): QuizSolvingResponse {
         val quizSolving = quizSolvingValidator.validateQuizSolvingNotExist(id)
-        val quiz = quizValidator.validateQuizNotExist(quizSolving.quiz.id)
+        val quiz = quizRepository.getByQuizBookId(quizSolving.quiz.id)
         quizSolvingValidator.validateMyQuizSolving(quizSolving, currentUser)
 
         val quizBookValue = vcRepository.findByQuizBookIdAndVersion(quizSolving.quizBookSolving.quizBook.id, quizSolving.quizBookSolving.version)
