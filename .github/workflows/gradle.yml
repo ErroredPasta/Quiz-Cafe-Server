@@ -38,8 +38,8 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      # ✅ 테스트 포함 빌드
-      - name: Build with Gradle Wrapper (with test)
+      # ✅ 테스트 제외 빌드
+      - name: Build with Gradle Wrapper (without test)
         run: ./gradlew build -x test --info --stacktrace
 
       - name: Build Docker image
@@ -89,6 +89,9 @@ jobs:
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
             -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
             -e SERVER_PORT="${{ secrets.SERVER_PORT }}" \
+            -e CLIENT_ID="${{ secrets.CLIENT_ID }}" \
+            -e CLIENT_SECRET="${{ secrets.CLIENT_SECRET }}" \
+            -e REDIRECT_URI="${{ secrets.REDIRECT_URI }}" \
             --name quiz-cafe-server ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
           echo "Docker container running"
 
