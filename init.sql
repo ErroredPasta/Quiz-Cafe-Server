@@ -41,7 +41,6 @@ CREATE TABLE quiz_book (
 CREATE TABLE quiz (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     quiz_book_id BIGINT NOT NULL,
-    version BIGINT NOT NULL,
     question_type ENUM('MCQ', 'SHORT_ANSWER', 'OX') NOT NULL,
     content TEXT NOT NULL,
     answer TEXT NOT NULL,
@@ -106,11 +105,11 @@ CREATE TABLE mcq_option_solving (
     CONSTRAINT fk_mos_quiz_solving FOREIGN KEY (quiz_solving_id) REFERENCES quiz_solving(id)
 );
 
-CREATE TABLE version (
+CREATE TABLE vc (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     quiz_book_id BIGINT NOT NULL,
     version BIGINT NOT NULL,
-    value TEXT
+    quizzes_value TEXT NOT NULL
 );
 
 -- 데이터 확인
@@ -119,71 +118,33 @@ SELECT * FROM quiz;
 SELECT * FROM mcq_option;
 select * from user;
 select * from quiz_book_solving;
+select * from quiz_solving;
+select * from vc;
 
+-- 테스트 유저 추가
 INSERT INTO user (login_email, password, nick_name, role)
 VALUES
-  ('test@naver.com', 'test1234', 'test', 'USER');
+  ('test@naver.com', 'test1234', 'test user', 'USER');
 
+-- 알고리즘 문제지 데이터 추가
 INSERT INTO quiz_book (version, category, title, level, description, created_by)
+VALUES (1, '알고리즘', '알고리즘 객관식 30제', 'HARD', '30문항으로 구성된 알고리즘 객관식 문제집입니다.', 1);
+
+SET @quiz_book_id = LAST_INSERT_ID();
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
 VALUES
-  (1, '네트워크', '네트워크 기초 문제집', 'EASY', '네트워크 기본 개념을 익히는 쉬운 문제집입니다.', 1),
-  (1, '운영체제', '운영체제 중급 문제집', 'MEDIUM', '운영체제 핵심 이론을 다루는 중급 문제집입니다.', 1),
-  (1, '알고리즘', '알고리즘 심화 문제집', 'HARD', '복잡한 알고리즘 문제들을 포함하는 어려운 문제집입니다.', 1),
-  (1, '스프링', '스프링 입문 문제집', 'EASY', '스프링 프레임워크 기본을 다루는 쉬운 문제집입니다.', 1),
-  (1, '코틀린', '코틀린 기초 문제집', 'EASY', '코틀린 문법과 기초 문제를 포함합니다.', 1);
+(@quiz_book_id, 'MCQ',
+ 'n개의 정점, m개의 간선을 가진 방향 그래프에서, 한 정점에서 모든 정점까지의 최단 거리를 구하는데 가장 적합한 알고리즘은?',
+ '3',
+ '다익스트라 알고리즘은 하나의 시작 정점에서 다른 모든 정점까지의 최단 경로를 찾을 때 가장 널리 사용되는 알고리즘입니다. 시간 복잡도는 우선순위 큐(힙)를 이용할 때 O((V+E)logV)입니다. 다만, 간선의 가중치가 모두 0 이상(음수가 없어야 함)일 때만 안전하게 사용할 수 있습니다. 2번 플로이드-워셜은 모든 정점 쌍 간의 최단 경로(출발점이 여러 개)를 한 번에 구할 때 사용하며, O(n^3)이라 한 출발점만 필요할 때는 비효율적입니다. 크루스칼과 프림은 최소 신장 트리(MST), DFS는 모든 경로를 일일이 탐색하기 때문에 비효율적입니다. 정리하면, 단일 출발점 → 모든 정점까지의 최단 경로는 다익스트라, 모든 쌍은 플로이드-워셜, 특정 목적은 문제 상황에 따라 선택합니다.'
+);
 
--- 6번 문제집 (네트워크 기초 문제집)
-INSERT INTO quiz (quiz_book_id, version, question_type, content, answer, explanation)
-VALUES (1, 1, 'MCQ', 'OSI 7계층 중 물리 계층의 역할은?', '전기적 신호 전송', '물리 계층은 데이터를 전기적 신호로 변환하여 전송하는 역할을 합니다.');
-SET @quiz_id_6 = LAST_INSERT_ID();
+SET @quiz_id = LAST_INSERT_ID();
 
 INSERT INTO mcq_option (quiz_id, option_number, option_content, is_correct) VALUES
-(@quiz_id_6, 1, '데이터 암호화', false),
-(@quiz_id_6, 2, '라우팅 결정', false),
-(@quiz_id_6, 3, '전기적 신호 전송', true),
-(@quiz_id_6, 4, '세션 관리', false);
-
--- 7번 문제집 (운영체제 중급 문제집)
-INSERT INTO quiz (quiz_book_id, version, question_type, content, answer, explanation)
-VALUES (2, 1, 'MCQ', '운영체제에서 프로세스와 스레드의 차이는?', '스레드는 프로세스 내의 작업 단위이다.', '스레드는 프로세스 내에서 실행되는 작업 단위로, 메모리 공간을 공유합니다.');
-SET @quiz_id_7 = LAST_INSERT_ID();
-
-INSERT INTO mcq_option (quiz_id, option_number, option_content, is_correct) VALUES
-(@quiz_id_7, 1, '프로세스는 스레드보다 빠르다.', false),
-(@quiz_id_7, 2, '스레드는 독립적인 메모리 공간을 가진다.', false),
-(@quiz_id_7, 3, '스레드는 프로세스 내의 작업 단위이다.', true),
-(@quiz_id_7, 4, '프로세스는 스레드보다 가볍다.', false);
-
--- 8번 문제집 (알고리즘 심화 문제집)
-INSERT INTO quiz (quiz_book_id, version, question_type, content, answer, explanation)
-VALUES (3, 1, 'MCQ', '다익스트라 알고리즘의 특징은?', '음수 가중치는 처리할 수 없다.', '다익스트라는 가중치가 음수가 아닌 경우에만 동작합니다.');
-SET @quiz_id_8 = LAST_INSERT_ID();
-
-INSERT INTO mcq_option (quiz_id, option_number, option_content, is_correct) VALUES
-(@quiz_id_8, 1, '음수 가중치를 처리할 수 있다.', false),
-(@quiz_id_8, 2, '모든 경우의 수를 탐색한다.', false),
-(@quiz_id_8, 3, '음수 가중치는 처리할 수 없다.', true),
-(@quiz_id_8, 4, '최소 신장 트리를 생성한다.', false);
-
--- 9번 문제집 (스프링 입문 문제집)
-INSERT INTO quiz (quiz_book_id, version, question_type, content, answer, explanation)
-VALUES (4, 1, 'MCQ', '스프링에서 의존성 주입(Dependency Injection)의 장점은?', '결합도를 낮출 수 있다.', '의존성 주입을 통해 객체 간 결합도를 줄이고 유연성을 높일 수 있습니다.');
-SET @quiz_id_9 = LAST_INSERT_ID();
-
-INSERT INTO mcq_option (quiz_id, option_number, option_content, is_correct) VALUES
-(@quiz_id_9, 1, '코드를 길게 만든다.', false),
-(@quiz_id_9, 2, '결합도를 낮출 수 있다.', true),
-(@quiz_id_9, 3, '속도를 낮춘다.', false),
-(@quiz_id_9, 4, '객체 생성을 제한한다.', false);
-
--- 10번 문제집 (코틀린 기초 문제집)
-INSERT INTO quiz (quiz_book_id, version, question_type, content, answer, explanation)
-VALUES (5, 1, 'MCQ', 'Kotlin에서 null을 안전하게 처리하는 방법은?', 'null-safe 연산자(?.)를 사용한다.', 'Kotlin은 null 안전성을 위해 ?. 등의 null-safe 연산자를 제공합니다.');
-SET @quiz_id_10 = LAST_INSERT_ID();
-
-INSERT INTO mcq_option (quiz_id, option_number, option_content, is_correct) VALUES
-(@quiz_id_10, 1, '널을 그대로 사용한다.', false),
-(@quiz_id_10, 2, 'null-safe 연산자(?.)를 사용한다.', true),
-(@quiz_id_10, 3, 'null을 무조건 제거한다.', false),
-(@quiz_id_10, 4, 'null을 허용하지 않는다.', false);
-
+(@quiz_id, 1, '크루스칼', false),
+(@quiz_id, 2, '플로이드-워셜', false),
+(@quiz_id, 3, '다익스트라', true),
+(@quiz_id, 4, '프림', false),
+(@quiz_id, 5, 'DFS', false);
