@@ -3,7 +3,7 @@ package com.project.quizcafe.domain.versioncontrol.entity
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "vc")
+@Table(name = "version")
 data class Vc(
 
     @Id
@@ -16,6 +16,6 @@ data class Vc(
     @Column(nullable = false)
     val version: Long,
 
-    @Column(name = "quizzes_value", columnDefinition = "TEXT")
+    @Column(name = "value", columnDefinition = "TEXT")
     val quizzesValue: String
 )
