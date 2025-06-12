@@ -9,7 +9,7 @@ import com.project.quizcafe.domain.quiz.extensions.toMcqOptionResponse
 import com.project.quizcafe.domain.quiz.repository.McqOptionRepository
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
 import com.project.quizcafe.domain.quiz.repository.getByQuizBookId
-import com.project.quizcafe.domain.quiz.validator.McqOptionValidator
+import com.project.quizcafe.domain.quiz.repository.getMcqOptionById
 import com.project.quizcafe.domain.quizbook.validator.QuizBookValidator
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.versioncontrol.service.VcService
@@ -22,8 +22,7 @@ class McqOptionService(
     private val mcqOptionRepository: McqOptionRepository,
     private val vcService: VcService,
     private val quizRepository: QuizRepository,
-    private val quizBookValidator: QuizBookValidator,
-    private val mcqOptionValidator: McqOptionValidator
+    private val quizBookValidator: QuizBookValidator
 ) {
 
     fun createMcqOption(request: CreateMcqOptionRequest, currentUser: User): McqOptionResponse {
@@ -38,7 +37,7 @@ class McqOptionService(
 
     @Transactional
     fun updateMcqOption(id: Long, request: UpdateMcqOptionRequest, currentUser: User) {
-        val mcqOption = mcqOptionValidator.validateMcqOptionNotExist(id)
+        val mcqOption = mcqOptionRepository.getMcqOptionById(id)
         quizBookValidator.validateMyQuizBook(mcqOption.quiz.quizBook, currentUser)
 
         vcService.save(mcqOption.quiz.quizBook.id, mcqOption.quiz.quizBook.version+1)
@@ -50,7 +49,7 @@ class McqOptionService(
 
 
     fun deleteMcqOption(id: Long, currentUser: User) {
-        val mcqOption = mcqOptionValidator.validateMcqOptionNotExist(id)
+        val mcqOption = mcqOptionRepository.getMcqOptionById(id)
         quizBookValidator.validateMyQuizBook(mcqOption.quiz.quizBook, currentUser)
         mcqOptionRepository.delete(mcqOption)
     }
@@ -61,7 +60,7 @@ class McqOptionService(
     }
 
     fun getMcqOptionsById(id: Long): McqOptionResponse {
-        val mcqOption = mcqOptionValidator.validateMcqOptionNotExist(id)
+        val mcqOption = mcqOptionRepository.getMcqOptionById(id)
         return mcqOption.toMcqOptionResponse()
     }
 }
