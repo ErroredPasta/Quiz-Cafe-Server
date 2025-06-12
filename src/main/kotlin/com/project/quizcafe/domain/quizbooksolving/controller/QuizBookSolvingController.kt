@@ -85,7 +85,7 @@ class QuizBookSolvingController(
         val responses = quizBookSolvingService.getQuizBookSolvingById(id)
         return ApiResponseFactory.success(
             data = responses,
-            message = "특정 유저의 모든 문제집 풀이 조회 성공",
+            message = "문제집 풀이 조회 성공",
             status = HttpStatus.OK
         )
     }
