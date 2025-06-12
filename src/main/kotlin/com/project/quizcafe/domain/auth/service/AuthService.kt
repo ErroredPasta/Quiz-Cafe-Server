@@ -1,5 +1,6 @@
 package com.project.quizcafe.domain.auth.service
 
+import com.project.quizcafe.common.exception.ConflictException
 import com.project.quizcafe.global.infrastructure.email.EmailSender
 import com.project.quizcafe.common.exception.InternalServerErrorException
 import com.project.quizcafe.domain.auth.dto.request.SendCodeRequest
@@ -27,7 +28,10 @@ class AuthService(
     private val userValidator: UserValidator
 ){
     fun signUp(request: SignUpRequest) {
-        userValidator.validateNickNameExist(request.nickName)
+        if (userRepository.existsByNickName(request.nickName)) {
+            throw ConflictException("이미 존재하는 닉네임입니다.")
+        }
+
         emailValidator.validateEmailExist(request.loginEmail)
 
         val encodedPassword = passwordEncoder.encode(request.password)
