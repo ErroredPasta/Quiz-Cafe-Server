@@ -22,9 +22,23 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-springdoc:
-  swagger-ui:
-    tags-sorter: alpha
+  springdoc:
+    swagger-ui:
+      tags-sorter: alpha
+    security:
+      oauth2:
+        client:
+          registration:
+            google:
+              client-id: ${CLIENT_ID}
+              client-secret: ${CLIENT_SECRET}
+              redirect-uri: ${REDIRECT_URI}
+              scope: profile, email
+          provider:
+            google:
+              authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+              token-uri: https://oauth2.googleapis.com/token
+              user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
 
 server:
   port: ${SERVER_PORT:8080}
