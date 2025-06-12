@@ -5,18 +5,20 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.project.quizcafe.domain.quiz.extensions.toSolvingResponses
 import com.project.quizcafe.domain.quiz.repository.McqOptionRepository
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
+import com.project.quizcafe.domain.quiz.repository.getByQuizBookId
 import com.project.quizcafe.domain.quiz.validator.QuizValidator
+import com.project.quizcafe.domain.quizbook.repository.QuizBookRepository
+import com.project.quizcafe.domain.quizbook.repository.getQuizBookById
 import com.project.quizcafe.domain.quizbooksolving.dto.request.CreateQuizBookSolvingRequest
 import com.project.quizcafe.domain.quizbooksolving.entity.QuizBookSolving
 import com.project.quizcafe.domain.quizbooksolving.repository.QuizBookSolvingRepository
-import com.project.quizcafe.domain.quizbook.validator.QuizBookValidator
 import com.project.quizcafe.domain.quizbooksolving.dto.request.UpdateQuizBookSolvingRequest
 import com.project.quizcafe.domain.quizbooksolving.dto.response.QuizBookSolvingResponse
 import com.project.quizcafe.domain.quizbooksolving.extensions.applyTo
 import com.project.quizcafe.domain.quizbooksolving.extensions.toQuizBookSolving
 import com.project.quizcafe.domain.quizbooksolving.extensions.toQuizBookSolvingResponse
+import com.project.quizcafe.domain.quizbooksolving.repository.getQuizBookSolvingById
 import com.project.quizcafe.domain.quizbooksolving.validator.QuizBookSolvingValidator
-import com.project.quizcafe.domain.quizsolving.dto.response.McqOptionSolvingResponse
 import com.project.quizcafe.domain.quizsolving.dto.response.QuizSolvingResponse
 import com.project.quizcafe.domain.quizsolving.extensions.toQuizSolving
 import com.project.quizcafe.domain.quizsolving.extensions.toQuizSolvingResponse
@@ -37,22 +39,22 @@ class QuizBookSolvingService(
     private val quizRepository: QuizRepository,
     private val vcRepository: VcRepository,
     private val mcqOptionRepository: McqOptionRepository,
-    private val quizBookValidator: QuizBookValidator,
     private val quizValidator: QuizValidator,
     private val quizBookSolvingValidator: QuizBookSolvingValidator,
-    private val quizSolvingValidator: QuizSolvingValidator
+    private val quizSolvingValidator: QuizSolvingValidator,
+    private val quizBookRepository: QuizBookRepository
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     @Transactional
     fun createQuizBookSolving(request: CreateQuizBookSolvingRequest, user: User): QuizBookSolving {
-        val quizBook = quizBookValidator.validateQuizBookNotExist(request.quizBookId)
+        val quizBook = quizBookRepository.getQuizBookById(request.quizBookId)
 
         val quizBookSolving = request.toQuizBookSolving(user, quizBook)
         val savedQuizBookSolving = quizBookSolvingRepository.save(quizBookSolving)
 
         request.quizzes.forEach {
-            val quiz = quizValidator.validateQuizNotExist(it.quizId)
+            val quiz = quizRepository.getByQuizBookId(it.quizId)
             val quizSolving = it.toQuizSolving(user, quiz, savedQuizBookSolving)
             quizSolvingRepository.save(quizSolving)
         }
@@ -60,13 +62,13 @@ class QuizBookSolvingService(
     }
 
     fun updateQuizBookSolving(id: Long, request: UpdateQuizBookSolvingRequest, currentUser: User) {
-        val quizBookSolving = quizBookSolvingValidator.validateQuizBookSolvingNotExist(id)
+        val quizBookSolving = quizBookSolvingRepository.getQuizBookSolvingById(id)
         quizBookSolvingValidator.validateMyQuizBookSolving(quizBookSolving, currentUser)
         request.applyTo(quizBookSolving)
     }
 
     fun deleteQuizBookSolving(id: Long, currentUser: User) {
-        val quizBookSolving = quizBookSolvingValidator.validateQuizBookSolvingNotExist(id)
+        val quizBookSolving = quizBookSolvingRepository.getQuizBookSolvingById(id)
         quizBookSolvingValidator.validateMyQuizBookSolving(quizBookSolving, currentUser)
         quizBookSolvingRepository.delete(quizBookSolving)
     }
@@ -91,7 +93,7 @@ class QuizBookSolvingService(
     }
 
     fun getQuizBookSolvingById(id: Long): QuizBookSolvingResponse {
-        val quizBookSolving = quizBookSolvingValidator.validateQuizBookSolvingNotExist(id)
+        val quizBookSolving = quizBookSolvingRepository.getQuizBookSolvingById(id)
 
         val quizBookValue = vcRepository.findByQuizBookIdAndVersion(quizBookSolving.quizBook.id, quizBookSolving.version)
             ?: throw RuntimeException("퀴즈북 버전을 찾을 수 없습니다.")
@@ -159,7 +161,7 @@ class QuizBookSolvingService(
         savedQuizBook: SavedQuizBook
     ): List<QuizSolvingResponse> {
         return savedQuizBook.quizzes.map { savedQuiz ->
-            val quiz = quizValidator.validateQuizNotExist(savedQuiz.id)
+            val quiz = quizRepository.getByQuizBookId(savedQuiz.id)
             val quizSolving = quizSolvingRepository.findByQuizBookSolvingIdAndQuizId(quizBookSolving.id, quiz.id)
             val mcqOptions = mcqOptionRepository.findByQuizId(quiz.id)
             val mcqOptionResponses = mcqOptions.toSolvingResponses(savedQuiz.id)

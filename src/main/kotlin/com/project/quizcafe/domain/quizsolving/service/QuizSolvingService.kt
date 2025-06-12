@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.project.quizcafe.domain.auth.security.UserDetailsImpl
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
+import com.project.quizcafe.domain.quiz.repository.getByQuizBookId
 import com.project.quizcafe.domain.quiz.validator.QuizValidator
 import com.project.quizcafe.domain.quizbooksolving.repository.QuizBookSolvingRepository
 import com.project.quizcafe.domain.quizsolving.dto.request.UpdateQuizSolvingRequest
@@ -12,6 +13,7 @@ import com.project.quizcafe.domain.quizsolving.extensions.applyTo
 import com.project.quizcafe.domain.quizsolving.extensions.toQuizSolvingResponse
 import com.project.quizcafe.domain.quizsolving.repository.McqOptionSolvingRepository
 import com.project.quizcafe.domain.quizsolving.repository.QuizSolvingRepository
+import com.project.quizcafe.domain.quizsolving.repository.getQuizSolvingById
 import com.project.quizcafe.domain.quizsolving.validator.QuizSolvingValidator
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.user.repository.UserRepository
@@ -35,8 +37,8 @@ class QuizSolvingService(
     private val mcqOptionSolvingRepository: McqOptionSolvingRepository,
 ) {
     fun getQuizSolving(id: Long, currentUser: User): QuizSolvingResponse {
-        val quizSolving = quizSolvingValidator.validateQuizSolvingNotExist(id)
-        val quiz = quizValidator.validateQuizNotExist(quizSolving.quiz.id)
+        val quizSolving = quizSolvingRepository.getQuizSolvingById(id)
+        val quiz = quizRepository.getByQuizBookId(quizSolving.quiz.id)
         quizSolvingValidator.validateMyQuizSolving(quizSolving, currentUser)
 
         val quizBookValue = vcRepository.findByQuizBookIdAndVersion(quizSolving.quizBookSolving.quizBook.id, quizSolving.quizBookSolving.version)
@@ -49,13 +51,13 @@ class QuizSolvingService(
     }
 
     fun updateQuizSolving(id: Long, request: UpdateQuizSolvingRequest, currentUser: User) {
-        val quizSolving = quizSolvingValidator.validateQuizSolvingNotExist(id)
+        val quizSolving = quizSolvingRepository.getQuizSolvingById(id)
         quizSolvingValidator.validateMyQuizSolving(quizSolving, currentUser)
         request.applyTo(quizSolving)
     }
 
     fun deleteQuizSolving(id: Long, currentUser: User) {
-        val quizSolving = quizSolvingValidator.validateQuizSolvingNotExist(id)
+        val quizSolving = quizSolvingRepository.getQuizSolvingById(id)
         quizSolvingValidator.validateMyQuizSolving(quizSolving, currentUser)
         quizSolvingRepository.delete(quizSolving)
     }
