@@ -17,6 +17,7 @@ import com.project.quizcafe.domain.quizbooksolving.dto.response.QuizBookSolvingR
 import com.project.quizcafe.domain.quizbooksolving.extensions.applyTo
 import com.project.quizcafe.domain.quizbooksolving.extensions.toQuizBookSolving
 import com.project.quizcafe.domain.quizbooksolving.extensions.toQuizBookSolvingResponse
+import com.project.quizcafe.domain.quizbooksolving.repository.getQuizBookSolvingById
 import com.project.quizcafe.domain.quizbooksolving.validator.QuizBookSolvingValidator
 import com.project.quizcafe.domain.quizsolving.dto.response.QuizSolvingResponse
 import com.project.quizcafe.domain.quizsolving.extensions.toQuizSolving
@@ -61,13 +62,13 @@ class QuizBookSolvingService(
     }
 
     fun updateQuizBookSolving(id: Long, request: UpdateQuizBookSolvingRequest, currentUser: User) {
-        val quizBookSolving = quizBookSolvingValidator.validateQuizBookSolvingNotExist(id)
+        val quizBookSolving = quizBookSolvingRepository.getQuizBookSolvingById(id)
         quizBookSolvingValidator.validateMyQuizBookSolving(quizBookSolving, currentUser)
         request.applyTo(quizBookSolving)
     }
 
     fun deleteQuizBookSolving(id: Long, currentUser: User) {
-        val quizBookSolving = quizBookSolvingValidator.validateQuizBookSolvingNotExist(id)
+        val quizBookSolving = quizBookSolvingRepository.getQuizBookSolvingById(id)
         quizBookSolvingValidator.validateMyQuizBookSolving(quizBookSolving, currentUser)
         quizBookSolvingRepository.delete(quizBookSolving)
     }
@@ -92,7 +93,7 @@ class QuizBookSolvingService(
     }
 
     fun getQuizBookSolvingById(id: Long): QuizBookSolvingResponse {
-        val quizBookSolving = quizBookSolvingValidator.validateQuizBookSolvingNotExist(id)
+        val quizBookSolving = quizBookSolvingRepository.getQuizBookSolvingById(id)
 
         val quizBookValue = vcRepository.findByQuizBookIdAndVersion(quizBookSolving.quizBook.id, quizBookSolving.version)
             ?: throw RuntimeException("퀴즈북 버전을 찾을 수 없습니다.")
