@@ -29,7 +29,7 @@ class SecurityConfig(
                 it.requestMatchers(
                     "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/v3/api-docs"
                 ).permitAll()
-                it.requestMatchers("/auth/**", "/oauth2/**").permitAll()
+                it.requestMatchers("/auth/**", "/oauth2/**", "/oauth2", "/login/oauth2").permitAll()
                 it.anyRequest().authenticated()
             }
             .oauth2Login {
