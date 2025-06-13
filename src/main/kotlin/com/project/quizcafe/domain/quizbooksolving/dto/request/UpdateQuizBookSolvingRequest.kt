@@ -6,5 +6,6 @@ import java.time.LocalDateTime
 
 data class UpdateQuizBookSolvingRequest (
     val correctCount: Int? = null,
+    val solvingTime: Long?,
     val completedAt: LocalDateTime? = LocalDateTime.now()
 )

@@ -29,6 +29,9 @@ class QuizBookSolving(
     @Column(nullable = false)
     var correctCount: Int,
 
+    @Column(name = "solving_time_seconds", nullable = true)
+    var solvingTimeSeconds: Long? = null,
+
     @Column(name = "completed_at", nullable = false)
     var completedAt: LocalDateTime = LocalDateTime.now(),
 )
