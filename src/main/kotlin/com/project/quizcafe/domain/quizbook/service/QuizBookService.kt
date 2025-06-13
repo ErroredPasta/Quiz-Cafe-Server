@@ -1,17 +1,17 @@
 package com.project.quizcafe.domain.quizbook.service
 
+import com.project.quizcafe.domain.quiz.extensions.toQuizResponse
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
+import com.project.quizcafe.domain.quiz.service.QuizService
 import com.project.quizcafe.domain.quizbook.dto.request.CreateQuizBookRequest
 import com.project.quizcafe.domain.quizbook.dto.request.UpdateQuizBookRequest
+import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookAllInfoResponse
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookAndQuizSummaryResponse
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookResponse
 import com.project.quizcafe.domain.quizbook.entity.QuizBook
-import com.project.quizcafe.domain.quizbook.extensions.applyTo
-import com.project.quizcafe.domain.quizbook.extensions.toGetQuizBookAndQuizSummaryResponse
-import com.project.quizcafe.domain.quizbook.extensions.toGetQuizBookResponse
+import com.project.quizcafe.domain.quizbook.extensions.*
 import com.project.quizcafe.domain.quizbook.repository.QuizBookBookmarkRepository
 import com.project.quizcafe.domain.quizbook.repository.QuizBookRepository
-import com.project.quizcafe.domain.quizbook.extensions.toQuizBook
 import com.project.quizcafe.domain.quizbook.repository.getQuizBookById
 import com.project.quizcafe.domain.quizbook.validator.QuizBookValidator
 import com.project.quizcafe.domain.quizbooksolving.repository.QuizBookSolvingRepository
@@ -27,7 +27,8 @@ class QuizBookService(
     private val vcService: VcService,
     private val quizBookBookmarkRepository: QuizBookBookmarkRepository,
     private val quizBookSolvingRepository: QuizBookSolvingRepository,
-    private val quizBookValidator: QuizBookValidator
+    private val quizBookValidator: QuizBookValidator,
+    private val quizService: QuizService
     ){
 
     @Transactional
@@ -64,6 +65,13 @@ class QuizBookService(
             isSaved = isSaved
         )
     }
+
+    fun getQuizBookAllInfoById(id: Long, user: User): GetQuizBookAllInfoResponse {
+        val quizBook = quizBookRepository.getQuizBookById(id)
+        val quizzes = quizService.getQuizzesByQuizBookId(id)
+        return quizBook.toGetAllInfoResponse(quizzes)
+    }
+
 
 
     fun getMyQuizBooks(user: User): List<GetQuizBookResponse> {

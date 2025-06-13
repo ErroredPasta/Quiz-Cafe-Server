@@ -1,9 +1,11 @@
 package com.project.quizcafe.domain.quizbook.extensions
 
+import com.project.quizcafe.domain.quiz.dto.response.QuizResponse
 import com.project.quizcafe.domain.quiz.entity.Quiz
 import com.project.quizcafe.domain.quizbook.entity.QuizBook
 import com.project.quizcafe.domain.quizbook.dto.request.CreateQuizBookRequest
 import com.project.quizcafe.domain.quizbook.dto.request.UpdateQuizBookRequest
+import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookAllInfoResponse
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookAndQuizSummaryResponse
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookResponse
 import com.project.quizcafe.domain.quizbook.dto.response.QuizSummary
@@ -68,4 +70,20 @@ fun UpdateQuizBookRequest.applyTo(quizBook: QuizBook) {
     title?.let { quizBook.title = it }
     description?.let { quizBook.description = it }
     level?.let { quizBook.level = it }
+}
+
+
+fun QuizBook.toGetAllInfoResponse(quizzes: List<QuizResponse>): GetQuizBookAllInfoResponse {
+    return GetQuizBookAllInfoResponse(
+        id = this.id,
+        version = this.id,
+        category = this.category,
+        title = this.title,
+        description = this.description,
+        level = this.level,
+        createdAt = this.createdAt,
+        totalQuizzes = quizzes.size,
+        createdBy = this.createdBy?.nickName,
+        quizzes = quizzes
+    )
 }
