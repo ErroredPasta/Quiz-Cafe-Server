@@ -25,12 +25,14 @@ class SecurityConfig(
         http
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .authorizeHttpRequests { it.anyRequest().permitAll() }
             .authorizeHttpRequests {
+                it.requestMatchers("*")
                 it.requestMatchers(
                     "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/v3/api-docs"
                 ).permitAll()
-                it.requestMatchers("/auth/**", "/oauth2/**", "/oauth2", "/login/oauth2", "/login/oauth2/code/**").permitAll()
+                it.requestMatchers(
+                    "/auth/**", "/oauth2/**", "/oauth2", "/login/oauth2", "/login/oauth2/code/**"
+                ).permitAll()
                 it.anyRequest().authenticated()
             }
             .oauth2Login {
