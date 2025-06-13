@@ -91,7 +91,7 @@ jobs:
             -e SERVER_PORT="${{ secrets.SERVER_PORT }}" \
             -e CLIENT_ID="${{ secrets.CLIENT_ID }}" \
             -e CLIENT_SECRET="${{ secrets.CLIENT_SECRET }}" \
-            -e REDIRECT_URI="${{ secrets.REDIRECT_URI }}" \
+            -e REDIRECT-URI="${{ secrets.REDIRECT_URI }}" \
             --name quiz-cafe-server ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
           echo "Docker container running"
 
