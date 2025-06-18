@@ -2,10 +2,7 @@ package com.project.quizcafe.domain.auth.controller
 
 import com.project.quizcafe.common.response.ApiResponse
 import com.project.quizcafe.common.response.ApiResponseFactory
-import com.project.quizcafe.domain.auth.dto.request.SendCodeRequest
-import com.project.quizcafe.domain.auth.dto.request.SignInRequest
-import com.project.quizcafe.domain.auth.dto.request.SignUpRequest
-import com.project.quizcafe.domain.auth.dto.request.VerifyCodeRequest
+import com.project.quizcafe.domain.auth.dto.request.*
 import com.project.quizcafe.domain.auth.dto.response.TokenResponse
 import com.project.quizcafe.domain.auth.security.UserDetailsImpl
 import com.project.quizcafe.domain.auth.service.AuthService
@@ -184,4 +181,30 @@ class AuthController(
             message = "비밀번호 재설정 성공"
         )
     }
+
+    @PostMapping("/google-login")
+    @Operation(summary = "구글 로그인", description = "구글 ID 토큰으로 로그인 및 JWT 토큰 발급")
+    @ApiResponses(
+        value = [
+            SwaggerApiResponse(
+                responseCode = "200",
+                description = "로그인 성공",
+                content = [Content(schema = Schema(implementation = TokenResponse::class))]
+            ),
+            SwaggerApiResponse(
+                responseCode = "401",
+                description = "인증 실패 - 토큰 검증 실패 등",
+                content = [Content(schema = Schema(hidden = true))]
+            )
+        ]
+    )
+    fun googleLogin(@RequestBody request: GoogleLoginRequest): ResponseEntity<ApiResponse<TokenResponse?>> {
+        val token = authService.googleLogin(request.idToken)
+        return ApiResponseFactory.success(
+            data = token,
+            message = "구글 로그인 성공",
+            status = HttpStatus.OK
+        )
+    }
+
 }
