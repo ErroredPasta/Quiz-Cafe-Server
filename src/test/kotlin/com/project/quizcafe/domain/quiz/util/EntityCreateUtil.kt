@@ -5,6 +5,7 @@ import com.project.quizcafe.domain.quiz.entity.McqOption
 import com.project.quizcafe.domain.quiz.entity.QuestionType
 import com.project.quizcafe.domain.quiz.entity.Quiz
 import com.project.quizcafe.domain.quizbook.entity.QuizBook
+import com.project.quizcafe.domain.quizbook.entity.QuizBookBookmark
 import com.project.quizcafe.domain.quizbook.entity.QuizLevel
 import com.project.quizcafe.domain.user.entity.User
 import java.time.LocalDateTime
@@ -30,12 +31,13 @@ fun createQuiz(
 fun createQuizBook(
     id: Long = 1L,
     version: Long = 1L,
+    category: String = "default-category",
     createdBy: User? = null,
     level: QuizLevel = QuizLevel.EASY
 ) = QuizBook(
     id = id,
     version = version,
-    category = "default-category",
+    category = category,
     title = "default-title",
     description = "default-description",
     createdBy = createdBy,
@@ -69,4 +71,15 @@ fun createMcqOption(
     optionNumber = optionNumber,
     optionContent = optionContent,
     isCorrect = isCorrect
+)
+
+fun createQuizBookBookmark(
+    id: Long = 1L,
+    user: User = createUser(),
+    quizBook: QuizBook,
+) = QuizBookBookmark(
+    id = id,
+    user = user,
+    quizBook = quizBook,
+    createdAt = LocalDateTime.now()
 )
