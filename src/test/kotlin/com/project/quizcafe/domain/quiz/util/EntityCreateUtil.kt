@@ -48,11 +48,13 @@ fun createQuizBook(
 
 fun createUser(
     id: Long = 1L,
+    loginEmail: String = "default@email.com",
+    password: String = "default password",
     nickName: String = "DefaultUser"
 ) = User(
     id = id,
-    loginEmail = "$nickName@example.com",
-    password = "password",
+    loginEmail = loginEmail,
+    password = password,
     nickName = nickName,
     role = Role.USER,
     provider = User.Provider.LOCAL,
