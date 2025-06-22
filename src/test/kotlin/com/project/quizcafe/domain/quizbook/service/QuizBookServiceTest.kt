@@ -3,10 +3,10 @@ package com.project.quizcafe.domain.quizbook.service
 import com.project.quizcafe.common.exception.ForbiddenException
 import com.project.quizcafe.common.exception.NotFoundException
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
-import com.project.quizcafe.domain.quiz.util.createQuiz
-import com.project.quizcafe.domain.quiz.util.createQuizBook
-import com.project.quizcafe.domain.quiz.util.createQuizBookBookmark
-import com.project.quizcafe.domain.quiz.util.createUser
+import com.project.quizcafe.domain.util.createQuiz
+import com.project.quizcafe.domain.util.createQuizBook
+import com.project.quizcafe.domain.util.createQuizBookBookmark
+import com.project.quizcafe.domain.util.createUser
 import com.project.quizcafe.domain.quizbook.dto.request.CreateQuizBookRequest
 import com.project.quizcafe.domain.quizbook.dto.request.UpdateQuizBookRequest
 import com.project.quizcafe.domain.quizbook.entity.QuizBook

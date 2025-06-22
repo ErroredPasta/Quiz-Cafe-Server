@@ -9,10 +9,10 @@ import com.project.quizcafe.domain.quiz.entity.Quiz
 import com.project.quizcafe.domain.quiz.extensions.toMcqOptionResponse
 import com.project.quizcafe.domain.quiz.extensions.toQuiz
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
-import com.project.quizcafe.domain.quiz.util.createMcqOption
-import com.project.quizcafe.domain.quiz.util.createQuiz
-import com.project.quizcafe.domain.quiz.util.createQuizBook
-import com.project.quizcafe.domain.quiz.util.createUser
+import com.project.quizcafe.domain.util.createMcqOption
+import com.project.quizcafe.domain.util.createQuiz
+import com.project.quizcafe.domain.util.createQuizBook
+import com.project.quizcafe.domain.util.createUser
 import com.project.quizcafe.domain.quiz.validator.QuizValidator
 import com.project.quizcafe.domain.quizbook.repository.QuizBookRepository
 import com.project.quizcafe.domain.versioncontrol.service.VcService

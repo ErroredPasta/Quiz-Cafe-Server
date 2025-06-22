@@ -4,7 +4,7 @@ import com.project.quizcafe.common.exception.AuthenticationException
 import com.project.quizcafe.common.exception.InternalServerErrorException
 import com.project.quizcafe.common.exception.NotFoundException
 import com.project.quizcafe.domain.auth.validator.EmailValidator
-import com.project.quizcafe.domain.quiz.util.createUser
+import com.project.quizcafe.domain.util.createUser
 import com.project.quizcafe.domain.user.dto.response.UserInfoResponse
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.user.repository.UserRepository

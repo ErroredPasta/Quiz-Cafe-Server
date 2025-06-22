@@ -11,7 +11,7 @@ import com.project.quizcafe.domain.auth.dto.request.SignUpRequest
 import com.project.quizcafe.domain.auth.entity.VerificationType
 import com.project.quizcafe.domain.auth.security.JwtTokenProvider
 import com.project.quizcafe.domain.auth.validator.EmailValidator
-import com.project.quizcafe.domain.quiz.util.createUser
+import com.project.quizcafe.domain.util.createUser
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.user.repository.UserRepository
 import com.project.quizcafe.domain.user.validator.UserValidator

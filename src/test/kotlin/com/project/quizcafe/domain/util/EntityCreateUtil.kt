@@ -1,4 +1,4 @@
-package com.project.quizcafe.domain.quiz.util
+package com.project.quizcafe.domain.util
 
 import com.project.quizcafe.common.model.Role
 import com.project.quizcafe.domain.quiz.entity.McqOption
