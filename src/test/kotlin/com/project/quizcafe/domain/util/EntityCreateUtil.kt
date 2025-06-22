@@ -1,6 +1,8 @@
 package com.project.quizcafe.domain.util
 
 import com.project.quizcafe.common.model.Role
+import com.project.quizcafe.domain.quiz.dto.response.McqOptionResponse
+import com.project.quizcafe.domain.quiz.dto.response.QuizResponse
 import com.project.quizcafe.domain.quiz.entity.McqOption
 import com.project.quizcafe.domain.quiz.entity.QuestionType
 import com.project.quizcafe.domain.quiz.entity.Quiz
@@ -84,4 +86,22 @@ fun createQuizBookBookmark(
     user = user,
     quizBook = quizBook,
     createdAt = LocalDateTime.now()
+)
+
+fun createQuizResponse(
+    id: Long = 1L,
+    quizBookId: Long = 1L,
+    questionType: QuestionType = QuestionType.SHORT_ANSWER,
+    content: String = "default content",
+    answer: String = "default answer",
+    explanation: String? = null,
+    mcqOption: List<McqOptionResponse>? = null
+) = QuizResponse(
+    id = id,
+    quizBookId = quizBookId,
+    questionType = questionType,
+    content = content,
+    answer = answer,
+    explanation = explanation,
+    mcqOption = mcqOption
 )
