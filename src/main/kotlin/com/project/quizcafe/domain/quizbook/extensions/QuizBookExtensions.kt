@@ -76,7 +76,7 @@ fun UpdateQuizBookRequest.applyTo(quizBook: QuizBook) {
 fun QuizBook.toGetAllInfoResponse(quizzes: List<QuizResponse>): GetQuizBookAllInfoResponse {
     return GetQuizBookAllInfoResponse(
         id = this.id,
-        version = this.id,
+        version = this.version,
         category = this.category,
         title = this.title,
         description = this.description,
