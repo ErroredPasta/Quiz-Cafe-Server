@@ -1,5 +1,6 @@
 package com.project.quizcafe.domain.auth.service
 
+import com.project.quizcafe.common.exception.AuthenticationException
 import com.project.quizcafe.common.exception.ConflictException
 import com.project.quizcafe.global.infrastructure.email.EmailSender
 import com.project.quizcafe.common.exception.InternalServerErrorException
@@ -9,6 +10,7 @@ import com.project.quizcafe.domain.auth.dto.request.SignUpRequest
 import com.project.quizcafe.domain.auth.dto.response.TokenResponse
 import com.project.quizcafe.domain.auth.entity.VerificationType
 import com.project.quizcafe.domain.auth.security.JwtTokenProvider
+import com.project.quizcafe.domain.auth.security.oauth.GoogleTokenVerifier
 import com.project.quizcafe.domain.auth.validator.EmailValidator
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.user.repository.UserRepository
@@ -16,6 +18,7 @@ import com.project.quizcafe.domain.user.validator.UserValidator
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import kotlin.random.Random
+
 
 @Service
 class AuthService(
@@ -25,12 +28,14 @@ class AuthService(
     private val emailValidator: EmailValidator,
     private val emailVerificationService: EmailVerificationService,
     private val emailSender: EmailSender,
-    private val userValidator: UserValidator
+    private val userValidator: UserValidator,
+    private val googleTokenVerifier: GoogleTokenVerifier
 ){
     fun signUp(request: SignUpRequest) {
-        if (userRepository.existsByNickName(request.nickName)) {
-            throw ConflictException("이미 존재하는 닉네임입니다.")
-        }
+
+//        if (userRepository.existsByNickName(request.nickName)) {
+//            throw ConflictException("이미 존재하는 닉네임입니다.")
+//        }
 
         emailValidator.validateEmailExist(request.loginEmail)
 
@@ -47,6 +52,7 @@ class AuthService(
     fun signIn(request: SignInRequest): TokenResponse {
         val user = emailValidator.validateEmailNotExist(request.loginEmail)
         userValidator.validatePasswordCorrect(request.password, user.password)
+        userValidator.validateOauthUser(user)
 
         val token = jwtTokenProvider.generateToken(user.loginEmail, user.role)
         return TokenResponse(token)
@@ -79,6 +85,26 @@ class AuthService(
         }
 
         emailSender.sendPasswordResetEmail(email, newPassword)
+    }
+
+    fun googleLogin(idToken: String): TokenResponse {
+        val payload = googleTokenVerifier.verify(idToken)
+            ?: throw AuthenticationException("구글 ID 토큰 검증 실패")
+
+        val email = payload.email
+        val name = payload["name"] as? String ?: "Unknown"
+        var user = userRepository.findByLoginEmail(email)
+
+        if(user != null){
+            if(user.provider != User.Provider.GOOGLE)
+                throw ConflictException("이미 존재하는 이메일입니다.")
+        }else{
+            user = User.createOAuthUser(email, name, User.Provider.GOOGLE)
+            user = userRepository.save(user)
+        }
+
+        val token = jwtTokenProvider.generateToken(user.loginEmail, user.role)
+        return TokenResponse(token)
     }
 
 }

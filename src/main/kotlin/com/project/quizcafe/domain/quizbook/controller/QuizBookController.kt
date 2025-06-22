@@ -6,6 +6,7 @@ import com.project.quizcafe.common.response.ApiResponseFactory
 import com.project.quizcafe.domain.quizbook.dto.request.CreateQuizBookRequest
 import com.project.quizcafe.domain.quizbook.dto.request.UpdateQuizBookRequest
 import com.project.quizcafe.domain.quizbook.dto.response.GetAllCategoriesResponse
+import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookAllInfoResponse
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookAndQuizSummaryResponse
 import com.project.quizcafe.domain.quizbook.dto.response.GetQuizBookResponse
 import com.project.quizcafe.domain.quizbook.entity.QuizCategory
@@ -53,11 +54,26 @@ class QuizBookController(
     }
 
     @GetMapping("/{quizBookId}")
+    @Operation(summary = "퀴즈북 id로 퀴즈북 정보 조회", description = "퀴즈북 id에 해당하는 퀴즈북 조회")
     fun getQuizBookById(
         @AuthenticationPrincipal principal: UserDetailsImpl,
         @PathVariable quizBookId: Long,
     ): ResponseEntity<ApiResponse<GetQuizBookAndQuizSummaryResponse?>> {
         val result = quizBookService.getQuizBookById(quizBookId, principal.getUser())
+        return ApiResponseFactory.success(
+            data = result,
+            message = "문제집 조회 성공",
+            status = HttpStatus.OK
+        )
+    }
+
+    @GetMapping("/all/{quizBookId}")
+    @Operation(summary = "퀴즈북 id로 퀴즈북의 모든 정보 조회", description = "퀴즈북 id에 해당하는 퀴즈북의 모든 정보 조회, 퀴즈의 모든 정보도 포함")
+    fun getQuizBookAllInfoById(
+        @AuthenticationPrincipal principal: UserDetailsImpl,
+        @PathVariable quizBookId: Long,
+    ): ResponseEntity<ApiResponse<GetQuizBookAllInfoResponse?>> {
+        val result = quizBookService.getQuizBookAllInfoById(quizBookId, principal.getUser())
         return ApiResponseFactory.success(
             data = result,
             message = "문제집 조회 성공",

@@ -17,5 +17,6 @@ data class QuizBookSolvingResponse(
     val totalQuizzes: Int,
     val correctCount: Int,
     val completedAt: LocalDateTime = LocalDateTime.now(),
+    val solvingTime: Long?,
     val quizzes: List<QuizSolvingResponse>
 )

@@ -16,6 +16,7 @@ fun CreateQuizBookSolvingRequest.toQuizBookSolving(user: User, quizBook: QuizBoo
     totalQuizzes = totalQuizzes,
     correctCount = correctCount,
     completedAt = completedAt,
+    solvingTimeSeconds = solvingTime
 )
 
 fun QuizBookSolving.toQuizBookSolvingResponse(
@@ -35,11 +36,13 @@ fun QuizBookSolving.toQuizBookSolvingResponse(
         totalQuizzes = this.totalQuizzes,
         correctCount = this.correctCount,
         completedAt = this.completedAt,
-        quizzes = quizSolvingResponses
+        solvingTime = this.solvingTimeSeconds,
+        quizzes = quizSolvingResponses,
     )
 }
 
 fun UpdateQuizBookSolvingRequest.applyTo(quizBookSolving: QuizBookSolving) {
     correctCount?.let { quizBookSolving.correctCount = it }
     completedAt?.let { quizBookSolving.completedAt = it }
+    solvingTime?.let { quizBookSolving.solvingTimeSeconds = it }
 }

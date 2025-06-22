@@ -80,7 +80,7 @@ jobs:
 
       - name: Run new container with env
         run: |
-          sudo docker run -d -p 80:8080 \
+          sudo docker run -d -p 8080:8080 \
             -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
             -e JWT_EXPIRATION="${{ secrets.JWT_EXPIRATION }}" \
             -e MAIL_USERNAME="${{ secrets.MAIL_USERNAME }}" \
@@ -91,7 +91,7 @@ jobs:
             -e SERVER_PORT="${{ secrets.SERVER_PORT }}" \
             -e CLIENT_ID="${{ secrets.CLIENT_ID }}" \
             -e CLIENT_SECRET="${{ secrets.CLIENT_SECRET }}" \
-            -e REDIRECT_URI="${{ secrets.REDIRECT_URI }}" \
+            -e REDIRECT-URI="${{ secrets.REDIRECT_URI }}" \
             --name quiz-cafe-server ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
           echo "Docker container running"
 

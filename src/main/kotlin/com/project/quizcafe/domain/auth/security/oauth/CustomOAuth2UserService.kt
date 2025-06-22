@@ -1,5 +1,6 @@
 package com.project.quizcafe.domain.auth.security.oauth
 
+import com.project.quizcafe.common.exception.ConflictException
 import com.project.quizcafe.domain.auth.validator.EmailValidator
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.user.repository.UserRepository
@@ -24,10 +25,29 @@ class CustomOAuth2UserService(
         val nickName = attributes["name"] as String
         val providerEnum = User.Provider.valueOf(provider.uppercase())
 
+
+        val existingUser = userRepository.findByLoginEmail(email)
+
+        if (existingUser != null) {
+            if (existingUser.provider != providerEnum) {
+                when (existingUser.provider) {
+                    User.Provider.LOCAL -> {
+                        throw ConflictException("이미 로컬 계정으로 가입된 이메일입니다.")
+                    }
+                    User.Provider.GOOGLE -> {
+                        throw ConflictException("이미 구글 계정으로 가입된 이메일입니다.")
+                    }
+                    else -> {
+                        throw ConflictException("이미 다른 방식으로 가입된 이메일입니다.")
+                    }
+                }
+            }
+            return CustomOAuth2User(existingUser.loginEmail, existingUser.role.name, attributes)
+        }
         emailValidator.validateEmailExist(email)
         val newUser = User.createOAuthUser(email, nickName, providerEnum)
-        val user = userRepository.save(newUser)
+        val savedUser = userRepository.save(newUser)
 
-        return CustomOAuth2User(user.loginEmail, user.role.name, attributes)
+        return CustomOAuth2User(savedUser.loginEmail, savedUser.role.name, attributes)
     }
 }
