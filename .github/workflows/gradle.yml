@@ -92,6 +92,8 @@ jobs:
             -e CLIENT_ID="${{ secrets.CLIENT_ID }}" \
             -e CLIENT_SECRET="${{ secrets.CLIENT_SECRET }}" \
             -e REDIRECT-URI="${{ secrets.REDIRECT_URI }}" \
+            -e MONGODB_HOST="${{ secrets.MONGODB_HOST }}" \
+            -e MONGODB_DATABASE_NAME="${{ secrets.MONGODB_DATABASE_NAME }}" \
             --name quiz-cafe-server ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server
           echo "Docker container running"
 

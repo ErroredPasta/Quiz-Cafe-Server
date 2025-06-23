@@ -1,21 +1,21 @@
 package com.project.quizcafe.domain.versioncontrol.entity
 
-import jakarta.persistence.*
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.index.CompoundIndex
+import org.springframework.data.mongodb.core.index.CompoundIndexes
 
-@Entity
-@Table(name = "version")
+@Document(collection = "version")
+@CompoundIndexes(
+    CompoundIndex(name = "quizBookId_version_idx", def = "{'quizBookId': 1, 'version': 1}", unique = true)
+)
 data class Vc(
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val id: String? = null,  // MongoDB ObjectId 문자열
 
-    @Column(name = "quiz_book_id", nullable = false)
     val quizBookId: Long,
 
-    @Column(nullable = false)
     val version: Long,
 
-    @Column(name = "value", columnDefinition = "TEXT")
     val quizzesValue: String
 )
