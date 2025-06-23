@@ -10,11 +10,12 @@ import com.project.quizcafe.domain.auth.dto.request.SignInRequest
 import com.project.quizcafe.domain.auth.dto.request.SignUpRequest
 import com.project.quizcafe.domain.auth.entity.VerificationType
 import com.project.quizcafe.domain.auth.security.JwtTokenProvider
+import com.project.quizcafe.domain.auth.security.oauth.GoogleTokenVerifier
 import com.project.quizcafe.domain.auth.validator.EmailValidator
-import com.project.quizcafe.domain.util.createUser
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.user.repository.UserRepository
 import com.project.quizcafe.domain.user.validator.UserValidator
+import com.project.quizcafe.domain.util.createUser
 import com.project.quizcafe.global.infrastructure.email.EmailSender
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
@@ -56,6 +57,9 @@ class AuthServiceTest {
 
     private lateinit var authService: AuthService
 
+    @RelaxedMockK
+    private lateinit var googleTokenProvider: GoogleTokenVerifier
+
     @BeforeEach
     fun setUp() {
         mockkObject(Random.Default)
@@ -63,13 +67,14 @@ class AuthServiceTest {
         emailValidator = EmailValidator(userRepository)
         userValidator = UserValidator(passwordEncoder)
         authService = AuthService(
-            userRepository,
-            passwordEncoder,
-            jwtTokenProvider,
-            emailValidator,
-            emailVerificationService,
-            emailSender,
-            userValidator
+            userRepository = userRepository,
+            passwordEncoder = passwordEncoder,
+            jwtTokenProvider = jwtTokenProvider,
+            emailValidator = emailValidator,
+            emailVerificationService = emailVerificationService,
+            emailSender = emailSender,
+            userValidator = userValidator,
+            googleTokenVerifier = googleTokenProvider
         )
     }
 
