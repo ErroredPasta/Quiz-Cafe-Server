@@ -9,7 +9,10 @@ import com.project.quizcafe.domain.quiz.entity.Quiz
 import com.project.quizcafe.domain.quizbook.entity.QuizBook
 import com.project.quizcafe.domain.quizbook.entity.QuizBookBookmark
 import com.project.quizcafe.domain.quizbook.entity.QuizLevel
+import com.project.quizcafe.domain.quizbooksolving.entity.QuizBookSolving
+import com.project.quizcafe.domain.quizsolving.entity.QuizSolving
 import com.project.quizcafe.domain.user.entity.User
+import com.project.quizcafe.domain.versioncontrol.dto.SavedQuizBook
 import java.time.LocalDateTime
 
 fun createQuiz(
@@ -104,4 +107,54 @@ fun createQuizResponse(
     answer = answer,
     explanation = explanation,
     mcqOption = mcqOption
+)
+
+fun createQuizSolving(
+    id: Long = 1L,
+    quizBookSolving: QuizBookSolving,
+    quiz: Quiz,
+    user: User,
+    memo: String? = null,
+    userAnswer: String? = null,
+    isCorrect: Boolean = false,
+    completedAt: LocalDateTime = LocalDateTime.now(),
+) = QuizSolving(
+    id = id,
+    quizBookSolving = quizBookSolving,
+    quiz = quiz,
+    user = user,
+    memo = memo,
+    userAnswer = userAnswer,
+    isCorrect = isCorrect,
+    completedAt = completedAt,
+)
+
+fun createQuizBookSolving(
+    id: Long = 1L,
+    user: User,
+    quizBook: QuizBook,
+    version: Long = 1L,
+    totalQuizzes: Int = 0,
+    correctCount: Int = 0,
+    completedAt: LocalDateTime = LocalDateTime.now(),
+) = QuizBookSolving(
+    id = id,
+    user = user,
+    quizBook = quizBook,
+    version = version,
+    totalQuizzes = totalQuizzes,
+    correctCount = correctCount,
+    completedAt = completedAt,
+)
+
+fun QuizBook.toSavedQuizBook(
+    creatorNickName: String,
+    quizzes: List<QuizResponse>
+) = SavedQuizBook(
+    category = category,
+    title = title,
+    level = level,
+    description = description,
+    createdBy = creatorNickName,
+    quizzes = quizzes
 )
