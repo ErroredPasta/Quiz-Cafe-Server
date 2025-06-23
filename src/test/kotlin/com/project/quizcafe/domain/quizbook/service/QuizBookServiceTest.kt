@@ -3,6 +3,7 @@ package com.project.quizcafe.domain.quizbook.service
 import com.project.quizcafe.common.exception.ForbiddenException
 import com.project.quizcafe.common.exception.NotFoundException
 import com.project.quizcafe.domain.quiz.repository.QuizRepository
+import com.project.quizcafe.domain.quiz.service.QuizService
 import com.project.quizcafe.domain.util.createQuiz
 import com.project.quizcafe.domain.util.createQuizBook
 import com.project.quizcafe.domain.util.createQuizBookBookmark
@@ -49,7 +50,11 @@ class QuizBookServiceTest {
 
     @Mock
     private lateinit var quizBookSolvingRepository: QuizBookSolvingRepository
+
     private lateinit var quizBookValidator: QuizBookValidator
+
+    @Mock
+    private lateinit var quizService: QuizService
 
     private lateinit var quizBookService: QuizBookService
 
@@ -62,7 +67,8 @@ class QuizBookServiceTest {
             vcService = vcService,
             quizBookBookmarkRepository = quizBookBookmarkRepository,
             quizBookSolvingRepository = quizBookSolvingRepository,
-            quizBookValidator = quizBookValidator
+            quizBookValidator = quizBookValidator,
+            quizService = quizService,
         )
     }
 
