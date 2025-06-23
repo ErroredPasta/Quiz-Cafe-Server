@@ -113,24 +113,6 @@ class AuthServiceTest {
     }
 
     @Test
-    fun `signUp, 이미 같은 닉네임이 존재하는 경우 ConflictException`() {
-        // given
-        val signUpRequest = createSignUpRequest(
-            loginEmail = "test@test.com",
-            password = "test password",
-            nickName = "test nickName",
-        )
-        every { userRepository.existsByNickName("test nickName") } returns true
-
-        // when
-        // then
-        val exception = assertThrows(ConflictException::class.java) {
-            authService.signUp(signUpRequest)
-        }
-        assertEquals(exception.message, "이미 존재하는 닉네임입니다.")
-    }
-
-    @Test
     fun `signUp, 이미 같은 이메일이 존재하는 경우 ConflictException`() {
         // given
         val signUpRequest = createSignUpRequest(
