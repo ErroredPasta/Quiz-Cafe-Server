@@ -20,6 +20,7 @@ spring:
   jwt:
     secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION:3600000}
+    refresh-expiration: ${REFRESH_EXPIRATION}
 
   mail:
     host: smtp.gmail.com
@@ -45,6 +46,10 @@ spring:
       host: ${MONGODB_HOST}
       port: 27017
       database: ${MONGODB_DATABASE_NAME}
+
+  redis:
+    host: ${PRIVATE_IP}
+    port: ${REDIS_PORT}
 
 springdoc:
   swagger-ui:
