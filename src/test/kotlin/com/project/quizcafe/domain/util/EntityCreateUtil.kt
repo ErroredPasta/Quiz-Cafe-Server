@@ -137,6 +137,7 @@ fun createQuizBookSolving(
     totalQuizzes: Int = 0,
     correctCount: Int = 0,
     completedAt: LocalDateTime = LocalDateTime.now(),
+    solvingTimeSeconds: Long? = null,
 ) = QuizBookSolving(
     id = id,
     user = user,
@@ -145,6 +146,7 @@ fun createQuizBookSolving(
     totalQuizzes = totalQuizzes,
     correctCount = correctCount,
     completedAt = completedAt,
+    solvingTimeSeconds = solvingTimeSeconds
 )
 
 fun QuizBook.toSavedQuizBook(
