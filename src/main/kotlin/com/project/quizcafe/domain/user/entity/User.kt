@@ -1,5 +1,9 @@
 package com.project.quizcafe.domain.user.entity
 
+import com.project.quizcafe.domain.quizbook.entity.QuizBook
+import com.project.quizcafe.domain.quizbook.entity.QuizBookBookmark
+import com.project.quizcafe.domain.quizbooksolving.entity.QuizBookSolving
+import com.project.quizcafe.domain.quizsolving.entity.QuizSolving
 import com.project.quizcafe.common.model.Role
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
@@ -7,7 +11,7 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(
-    uniqueConstraints = [UniqueConstraint(name = "uk_user_login_email", columnNames = ["loginEmail"])]
+    uniqueConstraints = [UniqueConstraint(name = "uk_user_login_email", columnNames = ["login_email"])]
 )
 data class User(
     @Id
@@ -32,7 +36,19 @@ data class User(
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: LocalDateTime? = null
+    val createdAt: LocalDateTime? = null,
+
+    @OneToMany(mappedBy = "createdBy", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val quizBooks: MutableList<QuizBook> = mutableListOf(),
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val quizBookBookmarks: MutableList<QuizBookBookmark> = mutableListOf(),
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val quizBookSolvings: MutableList<QuizBookSolving> = mutableListOf(),
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val quizSolvings: MutableList<QuizSolving> = mutableListOf()
 ) {
     enum class Provider {
         LOCAL, GOOGLE, KAKAO
@@ -64,3 +80,4 @@ data class User(
         }
     }
 }
+

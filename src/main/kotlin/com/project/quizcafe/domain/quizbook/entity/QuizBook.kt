@@ -1,5 +1,7 @@
 package com.project.quizcafe.domain.quizbook.entity
 
+import com.project.quizcafe.domain.quiz.entity.Quiz
+import com.project.quizcafe.domain.quizbooksolving.entity.QuizBookSolving
 import com.project.quizcafe.domain.user.entity.User
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -34,5 +36,14 @@ class QuizBook(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var level: QuizLevel
+    var level: QuizLevel,
+
+    @OneToMany(mappedBy = "quizBook", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val quizzes: MutableList<Quiz> = mutableListOf(),
+
+    @OneToMany(mappedBy = "quizBook", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val quizBookBookmarks: MutableList<QuizBookBookmark> = mutableListOf(),
+
+    @OneToMany(mappedBy = "quizBook", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val quizBookSolvings: MutableList<QuizBookSolving> = mutableListOf()
 )
