@@ -15,8 +15,8 @@ import javax.crypto.SecretKey
 @Component
 class JwtTokenProvider(
     @Value("\${spring.jwt.secret}") secretKey: String,
-    @Value("\${jwt.expiration}") private val accessTokenExpiration: Long,
-    @Value("\${jwt.refresh-expiration}") private val refreshTokenExpiration: Long
+    @Value("\${spring.jwt.expiration}") private val accessTokenExpiration: Long,
+    @Value("\${spring.jwt.refresh-expiration}") private val refreshTokenExpiration: Long
 ){
     private val key: SecretKey = Keys.hmacShaKeyFor(secretKey.toByteArray())
 

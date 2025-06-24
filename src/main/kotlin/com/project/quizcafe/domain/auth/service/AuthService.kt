@@ -70,15 +70,15 @@ class AuthService(
 
     fun reissue(refreshToken: String) : TokenResponse{
         if (!jwtTokenProvider.validateToken(refreshToken)) {
-            throw IllegalArgumentException("유효하지 않은 Refresh Token 입니다.")
+            throw AuthenticationException("유효하지 않은 Refresh Token 입니다.")
         }
         val email = jwtTokenProvider.getEmail(refreshToken)
         val roleString = jwtTokenProvider.getRole(refreshToken)
         val role = Role.valueOf(roleString)
         val savedRefreshToken = redisTemplate.opsForValue().get(email)
-            ?: throw IllegalArgumentException("로그아웃되었거나 토큰이 만료되었습니다.")
+            ?: throw AuthenticationException("로그아웃되었거나 토큰이 만료되었습니다.")
         if (savedRefreshToken != refreshToken) {
-            throw IllegalArgumentException("Refresh Token 정보가 일치하지 않습니다.")
+            throw AuthenticationException("Refresh Token 정보가 일치하지 않습니다.")
         }
         val newAccessToken = jwtTokenProvider.generateToken(email, role)
         val newRefreshToken = jwtTokenProvider.generateRefreshToken(email, role)
