@@ -347,7 +347,7 @@ class QuizBookSolvingServiceTest {
             val savedQuizBook = createQuizBook(id = quizBookId, version = 1)
                 .toSavedQuizBook("test nickName", quizzes)
             val vc = Vc(
-                id = id,
+                id = id.toString(),
                 quizBookId = quizBookId,
                 version = 1,
                 quizzesValue = objectMapper.writeValueAsString(savedQuizBook)
@@ -443,7 +443,7 @@ class QuizBookSolvingServiceTest {
             every { mcqOptionRepository.findByQuizId(any()) } returns emptyList()
 
             val vc = Vc(
-                id = id,
+                id = id.toString(),
                 quizBookId = quizBookId,
                 version = 1,
                 quizzesValue = "invalid quizzesValue"
@@ -484,7 +484,7 @@ class QuizBookSolvingServiceTest {
             val savedQuizBook = createQuizBook(id = quizBookId, version = 1)
                 .toSavedQuizBook("test nickName", quizzes)
             val vc = Vc(
-                id = id,
+                id = id.toString(),
                 quizBookId = quizBookId,
                 version = 1,
                 quizzesValue = objectMapper.writeValueAsString(savedQuizBook)
