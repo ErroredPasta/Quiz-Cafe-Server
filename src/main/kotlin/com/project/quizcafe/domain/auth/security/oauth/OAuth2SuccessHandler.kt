@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class OAuth2SuccessHandler(
@@ -21,8 +22,8 @@ class OAuth2SuccessHandler(
     ) {
         val oAuthUser = authentication.principal as OAuth2User
         val email = oAuthUser.getAttribute<String>("email") ?: return
-
-        val token = jwtTokenProvider.generateToken(email, Role.USER)
+        val sessionId = UUID.randomUUID().toString()
+        val token = jwtTokenProvider.generateToken(email, Role.USER, sessionId)
 
         // JWT 응답
         response.contentType = "application/json"

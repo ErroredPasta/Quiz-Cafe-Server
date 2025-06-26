@@ -44,6 +44,7 @@ class UserService(
 
     fun updateUserInfo(user: User, request: UpdateUserInfoRequest) {
         request.applyTo(user)
+        userRepository.save(user)
     }
 
     fun getUserInfo(user: User): UserInfoResponse {

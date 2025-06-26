@@ -14,7 +14,7 @@ CREATE TABLE user (
     CONSTRAINT uk_user_login_email UNIQUE (login_email)
 );
 
--- 이메일 인증 테이블
+-- 이메일 인증 테이블 (자식 테이블 없음)
 CREATE TABLE email_verification (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
@@ -24,6 +24,7 @@ CREATE TABLE email_verification (
     CONSTRAINT uk_email_verification_email UNIQUE (email)
 );
 
+-- quiz_book 테이블
 CREATE TABLE quiz_book (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     version BIGINT NOT NULL,
@@ -31,13 +32,13 @@ CREATE TABLE quiz_book (
     title VARCHAR(255) NOT NULL,
     level ENUM('EASY', 'MEDIUM', 'HARD') NOT NULL,
     description TEXT,
-    created_by BIGINT,  -- NULL 가능하도록 설정
+    created_by BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT fk_quiz_book_user FOREIGN KEY (created_by) REFERENCES user(id)
+    CONSTRAINT fk_quiz_book_user FOREIGN KEY (created_by) REFERENCES user(id) ON DELETE CASCADE
 );
 
--- 퀴즈 테이블 (quiz)
+-- quiz 테이블
 CREATE TABLE quiz (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     quiz_book_id BIGINT NOT NULL,
@@ -47,70 +48,74 @@ CREATE TABLE quiz (
     explanation TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT fk_quiz_book FOREIGN KEY (quiz_book_id) REFERENCES quiz_book(id)
+    CONSTRAINT fk_quiz_book FOREIGN KEY (quiz_book_id) REFERENCES quiz_book(id) ON DELETE CASCADE
 );
 
--- 객관식 선택지 테이블 (mcq_option)
+-- mcq_option 테이블
 CREATE TABLE mcq_option (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     quiz_id BIGINT NOT NULL,
     option_number INT NOT NULL,
     option_content TEXT NOT NULL,
     is_correct BOOLEAN NOT NULL DEFAULT FALSE,
-    CONSTRAINT fk_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id)
+    CONSTRAINT fk_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id) ON DELETE CASCADE
 );
 
+-- quiz_book_bookmark 테이블
 CREATE TABLE quiz_book_bookmark (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     quiz_book_id BIGINT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT fk_qbb_user FOREIGN KEY (user_id) REFERENCES user(id),
-    CONSTRAINT fk_qbb_quiz_book FOREIGN KEY (quiz_book_id) REFERENCES quiz_book(id),
-    CONSTRAINT unique_user_quiz_book UNIQUE (user_id, quiz_book_id)  -- 중복 북마크 방지
+    CONSTRAINT fk_qbb_user FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+    CONSTRAINT fk_qbb_quiz_book FOREIGN KEY (quiz_book_id) REFERENCES quiz_book(id) ON DELETE CASCADE,
+    CONSTRAINT unique_user_quiz_book UNIQUE (user_id, quiz_book_id)
 );
 
+-- quiz_book_solving 테이블
 CREATE TABLE quiz_book_solving (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     quiz_book_id BIGINT NOT NULL,
     version BIGINT NOT NULL,
-    total_quizzes INT NOT NULL,     -- 전체 문제 수
-    correct_count INT NOT NULL,     -- 맞춘 문제 수
-    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, -- 완료 시간
-    CONSTRAINT fk_solving_user FOREIGN KEY (user_id) REFERENCES user(id),
-    CONSTRAINT fk_solving_quiz_book FOREIGN KEY (quiz_book_id) REFERENCES quiz_book(id)
+    total_quizzes INT NOT NULL,
+    correct_count INT NOT NULL,
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT fk_solving_user FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+    CONSTRAINT fk_solving_quiz_book FOREIGN KEY (quiz_book_id) REFERENCES quiz_book(id) ON DELETE CASCADE
 );
 
+-- quiz_solving 테이블
 CREATE TABLE quiz_solving (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     quiz_book_solving_id BIGINT NOT NULL,
     quiz_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     memo TEXT,
-    user_answer TEXT, -- 사용자가 작성한 정답
-    is_correct BOOLEAN NOT NULL, -- 정답 여부 (true = 맞음, false = 틀림)
+    user_answer TEXT,
+    is_correct BOOLEAN NOT NULL,
     completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT fk_qs_quiz_book_solving FOREIGN KEY (quiz_book_solving_id) REFERENCES quiz_book_solving(id),
-    CONSTRAINT fk_qs_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id),
-    CONSTRAINT fk_qs_user FOREIGN KEY (user_id) REFERENCES user(id)
+    CONSTRAINT fk_qs_quiz_book_solving FOREIGN KEY (quiz_book_solving_id) REFERENCES quiz_book_solving(id) ON DELETE CASCADE,
+    CONSTRAINT fk_qs_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id) ON DELETE CASCADE,
+    CONSTRAINT fk_qs_user FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
+-- mcq_option_solving 테이블
 CREATE TABLE mcq_option_solving (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     quiz_solving_id BIGINT NOT NULL,
     option_number INT NOT NULL,
     option_content TEXT NOT NULL,
     is_correct BOOLEAN NOT NULL DEFAULT FALSE,
-    CONSTRAINT fk_mos_quiz_solving FOREIGN KEY (quiz_solving_id) REFERENCES quiz_solving(id)
+    CONSTRAINT fk_mos_quiz_solving FOREIGN KEY (quiz_solving_id) REFERENCES quiz_solving(id) ON DELETE CASCADE
 );
 
-CREATE TABLE vc (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    quiz_book_id BIGINT NOT NULL,
-    version BIGINT NOT NULL,
-    quizzes_value TEXT NOT NULL
-);
+-- CREATE TABLE vc (
+--     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+--     quiz_book_id BIGINT NOT NULL,
+--     version BIGINT NOT NULL,
+--     quizzes_value TEXT NOT NULL
+-- );
 
 -- 데이터 확인
 SELECT * FROM quiz_book;
@@ -643,3 +648,157 @@ INSERT INTO mcq_option (quiz_id, option_number, option_content, is_correct) VALU
 (@quiz_id, 3, '다익스트라', true),
 (@quiz_id, 4, '모두 MST 알고리즘', false),
 (@quiz_id, 5, '둘 다 아님', false);
+
+-- 테스트 문제집
+INSERT INTO quiz_book (version, category, title, level, description, created_by)
+VALUES (1, '네트워크', '네트워크 객관식', 'HARD', '네트워크 객관식 테스트 문제집', 1);
+
+SET @quiz_book_id = LAST_INSERT_ID();
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
+VALUES
+(@quiz_book_id, 'MCQ',
+ '네트워크 객관식 문제 1',
+ '3',
+ '네트워크 객관식 문제 1'
+);
+
+SET @quiz_id = LAST_INSERT_ID();
+
+INSERT INTO mcq_option (quiz_id, option_number, option_content, is_correct) VALUES
+(@quiz_id, 1, '오답', false),
+(@quiz_id, 2, '오답', false),
+(@quiz_id, 3, '정답', true),
+(@quiz_id, 4, '오답', false),
+(@quiz_id, 5, '오답', false);
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
+VALUES
+(@quiz_book_id, 'MCQ',
+ '네트워크 객관식 문제 2',
+ '2',
+ '네트워크 객관식 문제 2'
+);
+
+SET @quiz_id = LAST_INSERT_ID();
+
+INSERT INTO mcq_option (quiz_id, option_number, option_content, is_correct) VALUES
+(@quiz_id, 1, '오답', false),
+(@quiz_id, 2, '정답', true),
+(@quiz_id, 3, '오답', false),
+(@quiz_id, 4, '오답', false),
+(@quiz_id, 5, '오답', false);
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
+VALUES
+(@quiz_book_id, 'MCQ',
+ '네트워크 객관식 문제 3',
+ '3',
+ '네트워크 객관식 문제 3'
+);
+
+SET @quiz_id = LAST_INSERT_ID();
+
+INSERT INTO mcq_option (quiz_id, option_number, option_content, is_correct) VALUES
+(@quiz_id, 1, '오답', false),
+(@quiz_id, 2, '오답', false),
+(@quiz_id, 3, '정답', true),
+(@quiz_id, 4, '오답', false),
+(@quiz_id, 5, '오답', false);
+
+
+INSERT INTO quiz_book (version, category, title, level, description, created_by)
+VALUES (1, '네트워크', '네트워크 단답형', 'HARD', '네트워크 단답형 테스트 문제집', 1);
+
+SET @quiz_book_id = LAST_INSERT_ID();
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
+VALUES
+(@quiz_book_id, 'SHORT_ANSWER',
+ '네트워크 단답형 문제 1',
+ '정답',
+ '네트워크 단답형 문제 1'
+);
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
+VALUES
+(@quiz_book_id, 'SHORT_ANSWER',
+ '네트워크 단답형 문제 2',
+ '정답',
+ '네트워크 단답형 문제 2'
+);
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
+VALUES
+(@quiz_book_id, 'SHORT_ANSWER',
+ '네트워크 단답형 문제 3',
+ '정답',
+ '네트워크 단답형 문제 3'
+);
+
+INSERT INTO quiz_book (version, category, title, level, description, created_by)
+VALUES (1, '네트워크', '네트워크 OX', 'HARD', '네트워크 OX 테스트 문제집', 1);
+
+SET @quiz_book_id = LAST_INSERT_ID();
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
+VALUES
+(@quiz_book_id, 'OX',
+ '네트워크 OX 문제 1',
+ 'O',
+ '네트워크 OX 문제 1'
+);
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
+VALUES
+(@quiz_book_id, 'OX',
+ '네트워크 OX 문제 2',
+ 'X',
+ '네트워크 OX 문제 2'
+);
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
+VALUES
+(@quiz_book_id, 'OX',
+ '네트워크 OX 문제 3',
+ 'O',
+ '네트워크 OX 문제 3'
+);
+
+INSERT INTO quiz_book (version, category, title, level, description, created_by)
+VALUES (1, '네트워크', '네트워크 혼합형', 'HARD', '네트워크 혼합형 테스트 문제집', 1);
+
+SET @quiz_book_id = LAST_INSERT_ID();
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
+VALUES
+(@quiz_book_id, 'OX',
+ '네트워크 OX 문제 1',
+ 'O',
+ '네트워크 OX 문제 1'
+);
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
+VALUES
+(@quiz_book_id, 'SHORT_ANSWER',
+ '네트워크 단답형 문제 2',
+ '정답',
+ '네트워크 단답형 문제 2'
+);
+
+INSERT INTO quiz (quiz_book_id, question_type, content, answer, explanation)
+VALUES
+(@quiz_book_id, 'MCQ',
+ '네트워크 객관식 문제 3',
+ '3',
+ '네트워크 객관식 문제 3'
+);
+
+SET @quiz_id = LAST_INSERT_ID();
+
+INSERT INTO mcq_option (quiz_id, option_number, option_content, is_correct) VALUES
+(@quiz_id, 1, '오답', false),
+(@quiz_id, 2, '오답', false),
+(@quiz_id, 3, '정답', true),
+(@quiz_id, 4, '오답', false),
+(@quiz_id, 5, '오답', false);

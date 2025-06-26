@@ -14,40 +14,51 @@ import javax.crypto.SecretKey
 
 @Component
 class JwtTokenProvider(
-    @Value("\${spring.jwt.secret}") secretKey: String
+    @Value("\${spring.jwt.secret}") secretKey: String,
+    @Value("\${spring.jwt.expiration}") private val accessTokenExpiration: Long,
+    @Value("\${spring.jwt.refresh-expiration}") private val refreshTokenExpiration: Long
 ){
     private val key: SecretKey = Keys.hmacShaKeyFor(secretKey.toByteArray())
-    private val validityInMilliseconds = 3600000L//1시간
 
-    //JWT 발급
-    fun generateToken(email: String, role: Role): String {
-        val claims = Jwts.claims().setSubject(email) // 🔥 email을 subject로!
+    fun generateToken(email: String, role: Role, sessionId: String): String {
+        val claims = Jwts.claims().setSubject(email)
         claims["role"] = role.name
-
+        claims["sessionId"] = sessionId
         val now = Date()
-        val validity = Date(now.time + validityInMilliseconds)
-
         return Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(now)
-            .setExpiration(validity)
+            .setExpiration(Date(now.time + accessTokenExpiration))
             .signWith(key, SignatureAlgorithm.HS256)
             .compact()
     }
 
-    // 필터에서 인증 객체 생성
+    fun generateRefreshToken(email: String, role: Role, sessionId: String): String {
+        val claims = Jwts.claims().setSubject(email)
+        claims["role"] = role.name
+        claims["sessionId"] = sessionId
+        val now = Date()
+        return Jwts.builder()
+            .setClaims(claims)
+            .setIssuedAt(now)
+            .setExpiration(Date(now.time + refreshTokenExpiration))
+            .signWith(key, SignatureAlgorithm.HS256)
+            .compact()
+    }
+
     fun getAuthentication(token: String): Authentication {
-        val email = getEmail(token) // 🔥 여기서도 이메일 사용
+        val email = getEmail(token)
         val role = getRole(token)
         val authorities = listOf(SimpleGrantedAuthority("ROLE_$role"))
         return UsernamePasswordAuthenticationToken(email, "", authorities)
     }
 
-    // email 추출
     fun getEmail(token: String): String =
         Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body.subject
 
-    // role 추출은 동일
+    fun getSessionId(token: String): String =
+        Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body["sessionId"].toString()
+
     fun getRole(token: String): String =
         Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body["role"].toString()
 
