@@ -36,5 +36,8 @@ data class QuizSolving(
     var isCorrect: Boolean = false,
 
     @Column(name = "completed_at", nullable = false)
-    val completedAt: LocalDateTime = LocalDateTime.now()
+    val completedAt: LocalDateTime = LocalDateTime.now(),
+
+    @OneToMany(mappedBy = "quizSolving", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val mcqOptionSolvings: MutableList<McqOptionSolving> = mutableListOf()
 )

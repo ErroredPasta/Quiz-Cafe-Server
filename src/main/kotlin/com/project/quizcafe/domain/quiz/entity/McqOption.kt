@@ -13,11 +13,11 @@ class McqOption(
     val quiz: Quiz,
 
     @Column(nullable = false)
-    var optionNumber: Int, // 선택지 번호
+    var optionNumber: Int,
 
     @Column(nullable = false)
-    var optionContent: String, // 선택지 내용
+    var optionContent: String,
 
     @Column(nullable = false)
-    var isCorrect: Boolean // 정답 여부
+    var isCorrect: Boolean
 )
