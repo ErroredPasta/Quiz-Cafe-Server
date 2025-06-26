@@ -7,7 +7,8 @@ import com.project.quizcafe.domain.user.entity.User
 fun User.toUserInfoResponse(): UserInfoResponse {
     return UserInfoResponse(
         nickname = this.nickName,
-        email = this.loginEmail
+        email = this.loginEmail,
+        createdAt = this.createdAt
     )
 }
 
