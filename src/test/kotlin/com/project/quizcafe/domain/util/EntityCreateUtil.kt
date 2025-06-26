@@ -10,6 +10,7 @@ import com.project.quizcafe.domain.quizbook.entity.QuizBook
 import com.project.quizcafe.domain.quizbook.entity.QuizBookBookmark
 import com.project.quizcafe.domain.quizbook.entity.QuizLevel
 import com.project.quizcafe.domain.quizbooksolving.entity.QuizBookSolving
+import com.project.quizcafe.domain.quizsolving.entity.McqOptionSolving
 import com.project.quizcafe.domain.quizsolving.entity.QuizSolving
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.versioncontrol.dto.SavedQuizBook
@@ -159,4 +160,18 @@ fun QuizBook.toSavedQuizBook(
     description = description,
     createdBy = creatorNickName,
     quizzes = quizzes
+)
+
+fun createMcqOptionSolving(
+    id: Long = 1L,
+    quizSolving: QuizSolving,
+    optionNumber: Int = 1,
+    optionContent: String = "default optionContent",
+    isCorrect: Boolean = false,
+) = McqOptionSolving(
+    id = id,
+    quizSolving = quizSolving,
+    optionNumber = optionNumber,
+    optionContent = optionContent,
+    isCorrect = isCorrect,
 )
