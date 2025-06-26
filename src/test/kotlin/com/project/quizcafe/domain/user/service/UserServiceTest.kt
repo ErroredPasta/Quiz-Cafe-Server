@@ -4,11 +4,11 @@ import com.project.quizcafe.common.exception.AuthenticationException
 import com.project.quizcafe.common.exception.InternalServerErrorException
 import com.project.quizcafe.common.exception.NotFoundException
 import com.project.quizcafe.domain.auth.validator.EmailValidator
-import com.project.quizcafe.domain.util.createUser
 import com.project.quizcafe.domain.user.dto.response.UserInfoResponse
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.user.repository.UserRepository
 import com.project.quizcafe.domain.user.validator.UserValidator
+import com.project.quizcafe.domain.util.createUser
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
 @ExtendWith(MockKExtension::class)
@@ -150,14 +151,19 @@ class UserServiceTest {
         // given
         val user = createUser(
             loginEmail = "test@test.com",
-            nickName = "test nickName"
+            nickName = "test nickName",
+            createdAt = LocalDateTime.of(2025, 1, 1, 1, 1, 0),
         )
 
         // when
         val result = userService.getUserInfo(user)
 
         // then
-        val expected = UserInfoResponse(nickname = "test nickName", email = "test@test.com")
+        val expected = UserInfoResponse(
+            nickname = "test nickName",
+            email = "test@test.com",
+            createdAt = LocalDateTime.of(2025, 1, 1, 1, 1, 0)
+        )
         assertEquals(expected, result)
     }
 }

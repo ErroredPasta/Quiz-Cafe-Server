@@ -56,7 +56,8 @@ fun createUser(
     id: Long = 1L,
     loginEmail: String = "default@email.com",
     password: String = "default password",
-    nickName: String = "DefaultUser"
+    nickName: String = "DefaultUser",
+    createdAt: LocalDateTime = LocalDateTime.now(),
 ) = User(
     id = id,
     loginEmail = loginEmail,
@@ -64,7 +65,7 @@ fun createUser(
     nickName = nickName,
     role = Role.USER,
     provider = User.Provider.LOCAL,
-    createdAt = LocalDateTime.now()
+    createdAt = createdAt,
 )
 
 fun createMcqOption(
