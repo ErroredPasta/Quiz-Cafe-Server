@@ -21,6 +21,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockkObject
+import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkAll
 import io.mockk.verify
@@ -30,8 +31,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import java.util.UUID
 import kotlin.random.Random
 import kotlin.test.assertEquals
 
@@ -58,6 +61,9 @@ class AuthServiceTest {
     private lateinit var authService: AuthService
 
     @RelaxedMockK
+    private lateinit var redisTemplate: RedisTemplate<String, String>
+
+    @RelaxedMockK
     private lateinit var googleTokenProvider: GoogleTokenVerifier
 
     @BeforeEach
@@ -74,7 +80,8 @@ class AuthServiceTest {
             emailVerificationService = emailVerificationService,
             emailSender = emailSender,
             userValidator = userValidator,
-            googleTokenVerifier = googleTokenProvider
+            googleTokenVerifier = googleTokenProvider,
+            redisTemplate = redisTemplate,
         )
     }
 
@@ -143,16 +150,21 @@ class AuthServiceTest {
             password = passwordEncoder.encode("test password"),
         )
         val expectedJwt =
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3Mjk1MzE1NDcsImV4cCI6MTcyOTUzNTE0N30.80355336VJlgrkFwqPwnHMwKY3nfkiYqvnP1Hno5J5M"
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IlVTRVIiLCJzZXNzaW9uSWQiOiJ0ZXN0IHNlc3Npb25JZCIsImlhdCI6MTcyOTUzMTU0NywiZXhwIjoxNzI5NTM1MTQ3fQ.7o-nrR_afw6LD8Li2TcsObzcF0yf1pXmjiErvnl8uXo"
 
+        val uuid = UUID.fromString("350e8400-e29b-41d4-a716-446655440000")
+        mockkStatic(UUID::class)
+        every { UUID.randomUUID() } returns uuid
         every { userRepository.findByLoginEmail("test@test.com") } returns user
-        every { jwtTokenProvider.generateToken("test@test.com", Role.USER) } returns expectedJwt
+        every {
+            jwtTokenProvider.generateToken("test@test.com", Role.USER, "350e8400-e29b-41d4-a716-446655440000")
+        } returns expectedJwt
 
         // when
         val result = authService.signIn(signInRequest)
 
         // then
-        assertEquals(result.accessToken, expectedJwt)
+        assertEquals(expectedJwt, result.accessToken)
     }
 
     @Test
