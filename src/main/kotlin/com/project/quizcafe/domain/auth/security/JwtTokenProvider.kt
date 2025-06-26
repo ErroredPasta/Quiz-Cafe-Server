@@ -20,9 +20,10 @@ class JwtTokenProvider(
 ){
     private val key: SecretKey = Keys.hmacShaKeyFor(secretKey.toByteArray())
 
-    fun generateToken(email: String, role: Role): String {
+    fun generateToken(email: String, role: Role, sessionId: String): String {
         val claims = Jwts.claims().setSubject(email)
         claims["role"] = role.name
+        claims["sessionId"] = sessionId
         val now = Date()
         return Jwts.builder()
             .setClaims(claims)
@@ -32,9 +33,10 @@ class JwtTokenProvider(
             .compact()
     }
 
-    fun generateRefreshToken(email: String, role: Role): String {
+    fun generateRefreshToken(email: String, role: Role, sessionId: String): String {
         val claims = Jwts.claims().setSubject(email)
         claims["role"] = role.name
+        claims["sessionId"] = sessionId
         val now = Date()
         return Jwts.builder()
             .setClaims(claims)
@@ -53,6 +55,9 @@ class JwtTokenProvider(
 
     fun getEmail(token: String): String =
         Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body.subject
+
+    fun getSessionId(token: String): String =
+        Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body["sessionId"].toString()
 
     fun getRole(token: String): String =
         Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body["role"].toString()

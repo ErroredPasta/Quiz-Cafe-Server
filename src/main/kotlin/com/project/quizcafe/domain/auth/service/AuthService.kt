@@ -20,6 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.Duration
+import java.util.*
 import kotlin.random.Random
 
 
@@ -57,9 +58,9 @@ class AuthService(
         val user = emailValidator.validateEmailNotExist(request.loginEmail)
         userValidator.validatePasswordCorrect(request.password, user.password)
         userValidator.validateOauthUser(user)
-
-        val token = jwtTokenProvider.generateToken(user.loginEmail, user.role)
-        val refreshToken = jwtTokenProvider.generateRefreshToken(user.loginEmail,user.role)
+        val sessionId = UUID.randomUUID().toString()
+        val token = jwtTokenProvider.generateToken(user.loginEmail, user.role, sessionId)
+        val refreshToken = jwtTokenProvider.generateRefreshToken(user.loginEmail, user.role, sessionId)
         redisTemplate.opsForValue().set(user.loginEmail, refreshToken, Duration.ofDays(7))
 
         return TokenResponse(
@@ -80,8 +81,9 @@ class AuthService(
         if (savedRefreshToken != refreshToken) {
             throw AuthenticationException("Refresh Token 정보가 일치하지 않습니다.")
         }
-        val newAccessToken = jwtTokenProvider.generateToken(email, role)
-        val newRefreshToken = jwtTokenProvider.generateRefreshToken(email, role)
+        val sessionId = UUID.randomUUID().toString()
+        val newAccessToken = jwtTokenProvider.generateToken(email, role, sessionId)
+        val newRefreshToken = jwtTokenProvider.generateRefreshToken(email, role, sessionId)
         redisTemplate.opsForValue().set(email, newRefreshToken, Duration.ofDays(7))
         return TokenResponse(
             accessToken = newAccessToken,
@@ -134,8 +136,9 @@ class AuthService(
             user = userRepository.save(user)
         }
 
-        val token = jwtTokenProvider.generateToken(user.loginEmail, user.role)
-        val refreshToken = jwtTokenProvider.generateRefreshToken(user.loginEmail,user.role)
+        val sessionId = UUID.randomUUID().toString()
+        val token = jwtTokenProvider.generateToken(user.loginEmail, user.role, sessionId)
+        val refreshToken = jwtTokenProvider.generateRefreshToken(user.loginEmail, user.role, sessionId)
         redisTemplate.opsForValue().set(user.loginEmail, refreshToken, Duration.ofDays(7))
 
         return TokenResponse(
