@@ -32,7 +32,7 @@ class UserController(
         @AuthenticationPrincipal principal: UserDetailsImpl,
         @Valid @RequestBody request: ChangePasswordRequest
     ): ResponseEntity<ApiResponse<Unit?>> {
-        userService.changePassword(principal.getUser().nickName, request.oldPassword, request.newPassword)
+        userService.changePassword(principal.getUser().loginEmail, request.oldPassword, request.newPassword)
         return ApiResponseFactory.success(
             message = "비밀번호 변경 성공",
             status = HttpStatus.OK

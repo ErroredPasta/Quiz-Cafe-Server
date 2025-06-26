@@ -207,4 +207,23 @@ class AuthController(
         )
     }
 
+    @PostMapping("/reissue")
+    @Operation(summary = "토큰 재발급", description = "refresh token을 통해 access token 재발급")
+    @ApiResponses(
+        value = [
+            SwaggerApiResponse(
+                responseCode = "200",
+                description = "토큰 재발급 성공"
+            )
+        ]
+    )
+    fun reissue(@RequestBody request: TokenRequest): ResponseEntity<ApiResponse<TokenResponse?>> {
+        val token = authService.reissue(request.refreshToken)
+        return ApiResponseFactory.success(
+            data = token,
+            message = "토큰 재발급 성공",
+            status = HttpStatus.OK
+        )
+    }
+
 }

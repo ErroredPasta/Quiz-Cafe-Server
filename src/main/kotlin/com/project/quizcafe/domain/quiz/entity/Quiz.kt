@@ -1,6 +1,7 @@
 package com.project.quizcafe.domain.quiz.entity
 
 import com.project.quizcafe.domain.quizbook.entity.QuizBook
+import com.project.quizcafe.domain.quizsolving.entity.QuizSolving
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -32,5 +33,11 @@ class Quiz(
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @Column(name = "updated_at")
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
+
+    @OneToMany(mappedBy = "quiz", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val mcqOptions: MutableList<McqOption> = mutableListOf(),
+
+    @OneToMany(mappedBy = "quiz", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val quizSolvings: MutableList<QuizSolving> = mutableListOf()
 )

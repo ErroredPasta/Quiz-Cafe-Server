@@ -2,7 +2,7 @@ package com.project.quizcafe.domain.quizbooksolving.entity
 
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.quizbook.entity.QuizBook
-import com.project.quizcafe.domain.quizbook.entity.QuizLevel
+import com.project.quizcafe.domain.quizsolving.entity.QuizSolving
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -34,4 +34,7 @@ class QuizBookSolving(
 
     @Column(name = "completed_at", nullable = false)
     var completedAt: LocalDateTime = LocalDateTime.now(),
+
+    @OneToMany(mappedBy = "quizBookSolving", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val quizSolvings: MutableList<QuizSolving> = mutableListOf()
 )

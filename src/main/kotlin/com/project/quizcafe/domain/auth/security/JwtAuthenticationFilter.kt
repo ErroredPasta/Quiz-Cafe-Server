@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -16,8 +17,9 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Component
 class JwtAuthenticationFilter(
     private val jwtTokenProvider: JwtTokenProvider,
-    private val customUserDetailsService: CustomUserDetailsService
-) : OncePerRequestFilter() {
+    private val customUserDetailsService: CustomUserDetailsService,
+    private val redisTemplate: RedisTemplate<String, String>,
+    ) : OncePerRequestFilter() {
 
     private val log = LoggerFactory.getLogger(this::class.java)
     private val objectMapper = jacksonObjectMapper()
@@ -38,6 +40,16 @@ class JwtAuthenticationFilter(
                 }
 
                 val email = jwtTokenProvider.getEmail(token)
+                val sessionIdFromToken = jwtTokenProvider.getSessionId(token)
+                val savedRefreshToken = redisTemplate.opsForValue().get(email)
+                if(savedRefreshToken!=null){
+                    val sessionIdFromRedis = jwtTokenProvider.getSessionId(savedRefreshToken)
+                    if (sessionIdFromToken != sessionIdFromRedis) {
+                        setErrorResponse(response, HttpStatus.UNAUTHORIZED, "다른 기기에서 로그인되었습니다.")
+                        return
+                    }
+                }
+
                 val userDetails = customUserDetailsService.loadUserByUsername(email)
                 val authentication = UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.authorities
