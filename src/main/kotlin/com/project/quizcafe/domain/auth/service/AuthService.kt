@@ -65,7 +65,8 @@ class AuthService(
 
         return TokenResponse(
             accessToken = token,
-            refreshToken = refreshToken
+            refreshToken = refreshToken,
+            email = user.loginEmail
         )
     }
 
@@ -87,7 +88,8 @@ class AuthService(
         redisTemplate.opsForValue().set(email, newRefreshToken, Duration.ofDays(7))
         return TokenResponse(
             accessToken = newAccessToken,
-            refreshToken = newRefreshToken
+            refreshToken = newRefreshToken,
+            email = email
         )
     }
 
@@ -143,7 +145,9 @@ class AuthService(
 
         return TokenResponse(
             accessToken = token,
-            refreshToken = refreshToken
-        )    }
+            refreshToken = refreshToken,
+            email = user.loginEmail
+        )
+    }
 
 }
