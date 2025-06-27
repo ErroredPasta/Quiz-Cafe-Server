@@ -81,6 +81,7 @@ jobs:
       - name: Run new container with env
         run: |
           sudo docker run -d -p 8080:8080 \
+            --add-host=host.docker.internal:host-gateway \
             -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
             -e JWT_EXPIRATION="${{ secrets.JWT_EXPIRATION }}" \
             -e MAIL_USERNAME="${{ secrets.MAIL_USERNAME }}" \
@@ -94,7 +95,7 @@ jobs:
             -e REDIRECT-URI="${{ secrets.REDIRECT_URI }}" \
             -e MONGODB_HOST="${{ secrets.MONGODB_HOST }}" \
             -e MONGODB_DATABASE_NAME="${{ secrets.MONGODB_DATABASE_NAME }}" \
-            -e PRIVATE_IP="${{ secrets.PRIVATE_IP }}" \
+            -e PRIVATE_IP="host.docker.internal" \
             -e REDIS_PORT="${{ secrets.REDIS_PORT }}" \
             -e REFRESH_EXPIRATION="${{ secrets.REFRESH_EXPIRATION }}" \
             --name quiz-cafe-server ${{ secrets.DOCKERHUB_USERNAME }}/quiz-cafe-server

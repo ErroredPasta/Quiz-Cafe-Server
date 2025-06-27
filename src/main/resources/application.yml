@@ -48,7 +48,7 @@ spring:
       database: ${MONGODB_DATABASE_NAME}
 
   redis:
-    host: ${PRIVATE_IP}
+    host: 172.31.6.163
     port: ${REDIS_PORT}
 
 springdoc:
