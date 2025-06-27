@@ -17,6 +17,7 @@ import com.project.quizcafe.domain.quizbook.validator.QuizBookValidator
 import com.project.quizcafe.domain.quizbooksolving.repository.QuizBookSolvingRepository
 import com.project.quizcafe.domain.user.entity.User
 import com.project.quizcafe.domain.versioncontrol.service.VcService
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -100,5 +101,11 @@ class QuizBookService(
         quizBookValidator.validateMyQuizBook(quizBook, user)
 
         quizBookRepository.delete(quizBook)
+    }
+
+    fun getLatestQuizBooks(limit: Int): List<GetQuizBookResponse> {
+        val pageable = PageRequest.of(0, limit)
+        val quizBooks = quizBookRepository.findTopByOrderByCreatedAtDesc(pageable)
+        return quizBooks.map { it.toGetQuizBookResponse(it.quizzes) }
     }
 }

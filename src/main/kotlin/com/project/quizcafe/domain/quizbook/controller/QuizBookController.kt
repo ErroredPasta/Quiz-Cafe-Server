@@ -119,4 +119,17 @@ class QuizBookController(
         )
     }
 
+    @GetMapping("/latest")
+    @Operation(summary = "최신 퀴즈북 조회", description = "최신 퀴즈북을 생성일 기준으로 limit 개수만큼 반환 (기본 10개)")
+    fun getLatestQuizBooks(
+        @RequestParam(defaultValue = "10") limit: Int
+    ): ResponseEntity<ApiResponse<List<GetQuizBookResponse>?>> {
+        val quizBooks = quizBookService.getLatestQuizBooks(limit)
+        return ApiResponseFactory.success(
+            data = quizBooks,
+            message = "최신 문제집 조회 성공",
+            status = HttpStatus.OK
+        )
+    }
+
 }
