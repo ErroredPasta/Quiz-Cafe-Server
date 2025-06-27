@@ -38,6 +38,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      # ✅ 단위 테스트 실행
+      - name: Run Unit Tests
+        run: ./gradlew test --info --stacktrace
+
       # ✅ 테스트 제외 빌드
       - name: Build with Gradle Wrapper (without test)
         run: ./gradlew build -x test --info --stacktrace
